@@ -39,7 +39,7 @@ def handle_not_found(e):
 
 class Index(Resource):
     def get(self):
-        return {"index": "Welcome to the Home Haven"}
+        return {"index": "Welcome to the Neighbourhood Net"}
 
 class UserResource(Resource):
     def post(self):
