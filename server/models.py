@@ -38,7 +38,8 @@ class User(db.Model):
             "id": self.id,
             "username": self.username,
             "email": self.email,
-            "created_at": self.created_at.isoformat()
+            "created_at": self.created_at.isoformat(),
+            "events": [event.id for event in self.events]
         }
 
 class Event(db.Model):
@@ -52,9 +53,30 @@ class Event(db.Model):
     rsvps = db.relationship('RSVP', back_populates='event', lazy=True)
     users = db.relationship('User', secondary='rsvp', back_populates='events')
 
+    def to_dict(self):
+        return {
+            "id": self.id,
+            "name": self.name,
+            "type": self.type,
+            "date": self.date.isoformat(),
+            "time": self.time.isoformat(),
+            "location": self.location,
+            "image_url": self.image_url,
+            "users": [user.id for user in self.users]
+        }
+
 class RSVP(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     event_id = db.Column(db.Integer, db.ForeignKey('event.id'), nullable=False)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
     user = db.relationship('User', back_populates='rsvps')
     event = db.relationship('Event', back_populates='rsvps')
+
+    def to_dict(self):
+        return {
+            "id": self.id,
+            "event_id": self.event_id,
+            "user_id": self.user_id,
+            "user": self.user.to_dict(),
+            "event": self.event.to_dict()
+        }
