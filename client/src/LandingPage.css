@@ -1,118 +1,118 @@
 body, html {
-    height: 100%;
-    margin: 0;
-    font-family: Arial, sans-serif;
-  }
-  
-  .section {
-    height: 100vh;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-    padding-top: 50px;
-  }
-  
-  .landing-section {
-    background-image: url('../images/new-background.jpeg'); 
-    background-size: cover;
-    background-position: center;
-  }
-  
-  .welcome-section {
-    background: linear-gradient(to bottom, #4e958b, #192F2C);
-    color: white;
-    text-align: center;
-    padding-top: 30px; /* Adjust this value to move content further up or down */
-  }
-  
-  .app-bar {
-    width: 100%;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 30px;
-    background-color: rgba(0, 0, 0, 0.5); /* Translucent background */
-    position: absolute;
-    top: 0;
-    z-index: 10;
-    margin-bottom: 0%;
-  }
-  
-  .app-bar-links {
-    display: flex;
-    gap: 40px;
-    margin-left: 10px;
-  }
+  height: 100%;
+  margin: 0;
+  font-family: Arial, sans-serif;
+}
 
-  .right-links {
-    display: flex;
-    gap: 40px;
-  }
-  
+.section {
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  position: relative; /* Add relative positioning to use absolute positioning for children */
+}
 
-  .right-links a {
-    color: white;
-    text-decoration: none;
-    display: flex;
-    align-items: center;
-  }
-  
-  .app-bar-links a {
-    color: white;
-    text-decoration: none;
-    display: flex;
-    align-items: center;
-  }
-  
-  .app-bar-links i {
-    margin-right: 8px;
-  }
-  
-  .logo {
-    margin-top: 0px;
-    height: 500px;
-    
-  }
-  
-  .images-container {
-    display: flex;
-    justify-content: center;
-    align-items: flex-end;
-    gap: 100px;
-    margin-top: 4\0px;
-  }
-  
-  .image-card {
-    overflow: hidden;
-    border-radius: 30px;
-    width: 250px; /* Adjust width as needed */
-    height: 650px; /* Adjust height as needed */
-    position: relative;
-  }
-  
-  .image-card img {
-    width: 100%;
-    height: auto; /* Maintain aspect ratio */
-  }
-  
-  .image-caption {
-    padding: 10px;
-    font-size: 2em;
-    color: black;
-    text-align: center;
-  }
-  
-  /* Specific styles for each image card */
-  .image-card.share {
-    margin-bottom: 20px; /* Default margin */
-  }
-  
-  .image-card.protect {
-    margin-bottom: 100px; /* Lift the protect card higher */
-  }
-  
-  .image-card.engage {
-    margin-bottom: 20px; /* Default margin */
-  }
-  
+.landing-section {
+  background-image: url('../images/new-background.jpeg'); 
+  background-size: cover;
+  background-position: center;
+}
+
+.welcome-section {
+  background: linear-gradient(to bottom, #4e958b, #192F2C);
+  color: white;
+  text-align: center;
+  padding-top: 30px; /* Adjust this value to move content further up or down */
+}
+
+.app-bar {
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 30px;
+  background-color: rgba(0, 0, 0, 0.5); /* Translucent background */
+  position: absolute;
+  top: 0;
+  z-index: 10;
+  margin-bottom: 0%;
+}
+
+.app-bar-links {
+  display: flex;
+  gap: 40px;
+  margin-left: 10px;
+}
+
+.right-links {
+  display: flex;
+  gap: 40px;
+}
+
+.right-links a {
+  color: white;
+  text-decoration: none;
+  display: flex;
+  align-items: center;
+}
+
+.app-bar-links a {
+  color: white;
+  text-decoration: none;
+  display: flex;
+  align-items: center;
+}
+
+.app-bar-links i {
+  margin-right: 8px;
+}
+
+.logo {
+  position: absolute; /* Use absolute positioning */
+  top: 50px; /* Adjust the top value to move the logo up or down */
+  left: 50%;
+  transform: translateX(-50%);
+  height: 500px; /* Adjust the height as necessary */
+}
+
+.images-container {
+  display: flex;
+  justify-content: center;
+  align-items: flex-end;
+  gap: 100px;
+  margin-top: 70px;
+}
+
+.image-card {
+  overflow: hidden;
+  border-radius: 30px;
+  width: 250px; /* Adjust width as needed */
+  height: 650px; /* Adjust height as needed */
+  position: relative;
+}
+
+.image-card img {
+  width: 100%;
+  height: auto; /* Maintain aspect ratio */
+}
+
+.image-caption {
+  padding: 10px;
+  font-size: 2em;
+  color: black;
+  text-align: center;
+}
+
+/* Specific styles for each image card */
+.image-card.share {
+  margin-bottom: 20px; /* Default margin */
+}
+
+.image-card.protect {
+  margin-bottom: 100px; /* Lift the protect card higher */
+}
+
+.image-card.engage {
+  margin-bottom: 20px; /* Default margin */
+}

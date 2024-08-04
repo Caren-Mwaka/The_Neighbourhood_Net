@@ -8,6 +8,7 @@
   }
   
   .registration-container {
+    width: 400px;
     background-color: rgba(255, 255, 255, 0.9);
     padding: 60px;
     border-radius: 20px;
@@ -41,7 +42,7 @@
   }
   
   .error {
-    color: red;
+    color: rgba(243, 27, 27, 0.705);
     font-size: 0.875em;
     margin-top: 5px;
   }
@@ -49,11 +50,12 @@
   .registration-form button {
     padding: 10px;
     border: none;
-    border-radius: 4px;
+    border-radius: 18px;
     background-color: #4e958b;
     color: white;
     font-size: 1.2em;
     cursor: pointer;
+    
   }
   
   .registration-form button:hover {
