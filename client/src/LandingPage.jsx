@@ -15,16 +15,14 @@ const LandingPage = () => {
       <div className="section landing-section" style={{ backgroundImage: `url(${backgroundImage})` }}>
         <header className="app-bar">
           <div className="app-bar-links">
-            <a href="#contact">
+            <a href="#contact" className="contact-link">
               <FontAwesomeIcon icon={faAddressBook} size="2x" />
-              CONTACT US
+              <span>CONTACT US</span>
             </a>
             <a href="#about">ABOUT</a>
           </div>
           <div className="right-links">
             <a href="#login">LOGIN</a>
-
-            
             <Link to="/register">REGISTER</Link>
           </div>
         </header>
