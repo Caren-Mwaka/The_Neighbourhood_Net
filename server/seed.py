@@ -1,4 +1,3 @@
-# seed.py
 from app import app, bcrypt
 from models import db, User, Event, RSVP
 from datetime import datetime
@@ -9,9 +8,9 @@ def seed_db():
         db.create_all()
 
         # Add initial users
-        user1 = User(username='john_doe', email='john@example.com', password=bcrypt.generate_password_hash('password123').decode('utf-8'))
-        user2 = User(username='jane_doe', email='jane@example.com', password=bcrypt.generate_password_hash('password123').decode('utf-8'))
-
+        user1 = User(name='John Doe', username='john_doe', email='john@example.com', password=bcrypt.generate_password_hash('Password123!').decode('utf-8'))
+        user2 = User(name='Jane Doe', username='jane_doe', email='jane@example.com', password=bcrypt.generate_password_hash('Password!123').decode('utf-8'))
+        
         db.session.add(user1)
         db.session.add(user2)
         db.session.commit()
@@ -38,15 +37,15 @@ def seed_db():
         db.session.add(event2)
         db.session.commit()
 
-        
         # Add initial RSVP records
-        rsvp1 = RSVP(event_id=1, user_name='john_doe', user_email='john@example.com')
-        rsvp2 = RSVP(event_id=2, user_name='jane_doe', user_email='jane@example.com')
+        rsvp1 = RSVP(event_id=event1.id, user_id=user1.id, username=user1.username)  # Use IDs
+        rsvp2 = RSVP(event_id=event2.id, user_id=user2.id, username=user2.username)  # Use IDs
 
         db.session.add(rsvp1)
         db.session.add(rsvp2)
         db.session.commit()
 
         print("Database seeded successfully!")
+
 if __name__ == '__main__':
     seed_db()

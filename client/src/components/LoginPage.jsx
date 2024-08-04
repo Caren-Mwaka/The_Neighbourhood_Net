@@ -1,7 +1,9 @@
 import React, { useState } from "react";
+import { useNavigate } from 'react-router-dom';
 import InputField from "./InputField";
 import LoginButton from "./LoginButton";
 import Logo from "./Logo";
+import './login.css'; 
 
 function LoginPage() {
   const [email, setEmail] = useState("");
@@ -9,6 +11,7 @@ function LoginPage() {
   const [confirmPassword, setConfirmPassword] = useState("");
   const [loading, setLoading] = useState(false);
   const [errors, setErrors] = useState({});
+  const navigate = useNavigate();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -30,7 +33,7 @@ function LoginPage() {
     }
 
     try {
-      const response = await fetch("", {
+      const response = await fetch("http://localhost:5555/login", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -44,6 +47,7 @@ function LoginPage() {
 
       const data = await response.json();
       console.log("Login successful:", data);
+      navigate('/home');
     } catch (error) {
       console.error("Login failed:", error);
       setErrors({ general: "Login failed. Please try again." });
@@ -53,21 +57,19 @@ function LoginPage() {
   };
 
   return (
-    <main className="flex min-h-screen bg-cyan-50">
-      <section className="hidden md:flex md:w-1/2 items-center justify-center pl-12">
-        {" "}
-        {/* Increased padding-left */}
+    <main className="main-container">
+      <section className="image-section">
         <img
           loading="lazy"
           src="https://cdn.builder.io/api/v1/image/assets/TEMP/66f1b2d79798fa5098c1051e41abcfdb9161928ec15a846aa739a87e1a2f6ebb?apiKey=d4171c20f3c64f169e97de7e2ed39491&&apiKey=d4171c20f3c64f169e97de7e2ed39491"
           alt="Login illustration"
-          className="object-contain max-w-full max-h-[80vh] mb-2" // Retained the previous margin-bottom
+          className="login-illustration"
         />
       </section>
-      <section className="w-full md:w-1/2 flex flex-col items-center justify-center p-2">
-        <Logo className="mb-2" />
-        <h1 className="text-5xl font-black text-black mb-4">Welcome back!</h1>
-        <form className="w-full max-w-lg" onSubmit={handleSubmit}>
+      <section className="form-section">
+        <Logo className="logo" />
+        <h1 className="welcome-text">Welcome back!</h1>
+        <form className="login-form" onSubmit={handleSubmit}>
           <InputField
             label="Enter your email"
             type="email"
@@ -92,7 +94,7 @@ function LoginPage() {
             error={errors.confirmPassword}
           />
           {errors.general && (
-            <div className="text-red-500 text-sm mb-4">{errors.general}</div>
+            <div className="error-text">{errors.general}</div>
           )}
           <LoginButton loading={loading} />
         </form>
