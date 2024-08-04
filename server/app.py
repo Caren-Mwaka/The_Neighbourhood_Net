@@ -50,21 +50,24 @@ class UserResource(Resource):
 
 class RegisterResource(Resource):
     def post(self):
+        name = request.json.get("name") 
         username = request.json.get("username")
         email = request.json.get("email")
         password = request.json.get("password")
+       
 
-        if not username or not email or not password:
+        if not username or not email or not password or not name:
             return {"error": "Missing fields"}, 400
 
         if User.query.filter_by(email=email).first():
             return {"error": "Email already exists"}, 400
 
         hashed_password = bcrypt.generate_password_hash(password).decode('utf-8')
-        new_user = User(username=username, email=email, password=hashed_password)
+        new_user = User(username=username, email=email, password=hashed_password, name=name)
         db.session.add(new_user)
         db.session.commit()
         return new_user.to_dict(), 201
+
 
 class LoginResource(Resource):
     def post(self):
@@ -135,13 +138,15 @@ class RSVPResource(Resource):
     def post(self):
         data = request.get_json()
         event_id = data.get('event_id')
-        user_name = data.get('user_name')
-        user_email = data.get('user_email')
 
-        if not event_id or not user_name or not user_email:
+        if not event_id:
             return {'error': 'Invalid data'}, 400
 
-        rsvp = RSVP(event_id=event_id, user_name=user_name, user_email=user_email)
+        user = User.query.filter_by(username=get_jwt_identity()).first()
+        if not user:
+            return {'error': 'User not found'}, 404
+
+        rsvp = RSVP(event_id=event_id, user_id=user.id, username=user.username)
         db.session.add(rsvp)
         db.session.commit()
         return {'message': 'RSVP successful'}, 201
@@ -155,6 +160,7 @@ class RSVPResource(Resource):
         db.session.delete(rsvp)
         db.session.commit()
         return {'message': 'RSVP deleted'}, 200
+
 
 api.add_resource(Index, '/')
 api.add_resource(UserResource, '/users', '/users/<int:user_id>')

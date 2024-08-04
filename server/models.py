@@ -6,11 +6,13 @@ db = SQLAlchemy()
 
 class User(db.Model):
     id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(255), nullable=False) 
     username = db.Column(db.String(80), nullable=False, unique=True)
     email = db.Column(db.String(120), nullable=False, unique=True)
-    password = db.Column(db.String(128), nullable=False)
+    password = db.Column(db.String(255), nullable=False)
     created_at = db.Column(db.DateTime, nullable=False, default=db.func.current_timestamp())
-    rsvps = db.relationship('RSVP', back_populates='user')
+    
+    rsvps = db.relationship('RSVP', back_populates='user', cascade='all, delete-orphan')
     events = db.relationship('Event', secondary='rsvp', back_populates='users')
 
     @validates('email')
@@ -42,6 +44,7 @@ class User(db.Model):
             "events": [event.id for event in self.events]
         }
 
+
 class Event(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(100), nullable=False)
@@ -65,10 +68,12 @@ class Event(db.Model):
             "users": [user.id for user in self.users]
         }
 
+
 class RSVP(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     event_id = db.Column(db.Integer, db.ForeignKey('event.id'), nullable=False)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    username = db.Column(db.String(80), nullable=False)  # Add username field
     user = db.relationship('User', back_populates='rsvps')
     event = db.relationship('Event', back_populates='rsvps')
 
@@ -77,6 +82,7 @@ class RSVP(db.Model):
             "id": self.id,
             "event_id": self.event_id,
             "user_id": self.user_id,
-            "user": self.user.to_dict(),
+            "username": self.username,  # Include username in dict
             "event": self.event.to_dict()
         }
+
