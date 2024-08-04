@@ -10,7 +10,8 @@ class User(db.Model):
     email = db.Column(db.String(120), nullable=False, unique=True)
     password = db.Column(db.String(128), nullable=False)
     created_at = db.Column(db.DateTime, nullable=False, default=db.func.current_timestamp())
-    
+    rsvps = db.relationship('RSVP', back_populates='user')
+    events = db.relationship('Event', secondary='rsvp', back_populates='users')
 
     @validates('email')
     def validate_email(self, key, email):
@@ -37,5 +38,45 @@ class User(db.Model):
             "id": self.id,
             "username": self.username,
             "email": self.email,
-            "created_at": self.created_at.isoformat()
+            "created_at": self.created_at.isoformat(),
+            "events": [event.id for event in self.events]
+        }
+
+class Event(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(100), nullable=False)
+    type = db.Column(db.String(50), nullable=False)
+    date = db.Column(db.Date, nullable=False)
+    time = db.Column(db.Time, nullable=False)
+    location = db.Column(db.String(100), nullable=False)
+    image_url = db.Column(db.String(200))
+    rsvps = db.relationship('RSVP', back_populates='event', lazy=True)
+    users = db.relationship('User', secondary='rsvp', back_populates='events')
+
+    def to_dict(self):
+        return {
+            "id": self.id,
+            "name": self.name,
+            "type": self.type,
+            "date": self.date.isoformat(),
+            "time": self.time.isoformat(),
+            "location": self.location,
+            "image_url": self.image_url,
+            "users": [user.id for user in self.users]
+        }
+
+class RSVP(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    event_id = db.Column(db.Integer, db.ForeignKey('event.id'), nullable=False)
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    user = db.relationship('User', back_populates='rsvps')
+    event = db.relationship('Event', back_populates='rsvps')
+
+    def to_dict(self):
+        return {
+            "id": self.id,
+            "event_id": self.event_id,
+            "user_id": self.user_id,
+            "user": self.user.to_dict(),
+            "event": self.event.to_dict()
         }
