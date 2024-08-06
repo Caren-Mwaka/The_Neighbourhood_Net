@@ -1,7 +1,7 @@
-from flask import Flask, jsonify, request
+from flask import Flask, jsonify, request, session
 from flask_migrate import Migrate
 from flask_cors import CORS
-from models import db, User, Event, RSVP  # Ensure all models are imported
+from models import db, User, Event, RSVP  
 from flask_bcrypt import Bcrypt
 from flask_jwt_extended import JWTManager, create_access_token, jwt_required, get_jwt_identity
 from flask_restful import Api, Resource
@@ -9,6 +9,7 @@ from werkzeug.exceptions import NotFound
 
 app = Flask(__name__)
 
+app.config['SECRET_KEY'] = 'your-unique-secret-key'
 app.config['JWT_SECRET_KEY'] = 'super-secret-key'
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///app.db'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
@@ -22,6 +23,11 @@ api = Api(app)
 
 def generate_token(user):
     return create_access_token(identity=user.username)
+
+@app.route('/logout', methods=['POST'])
+def logout():
+    session.clear()  
+    return jsonify({"message": "Logged out successfully"}), 200
 
 @app.route('/protected', methods=['GET'])
 @jwt_required()
