@@ -1,12 +1,11 @@
-
 import React from 'react';
 import { Link } from 'react-router-dom';
 import './LandingPage.css';
-import logoImage from './assets/images/logo.jpeg'; // Correct path to your logo
-import backgroundImage from './assets/images/landingpage.jpg'; // Correct path to your background image
-import shareImage from './assets/images/share.jpeg'; // Correct path to your share image
-import protectImage from './assets/images/protect.jpeg'; // Correct path to your protect image
-import engageImage from './assets/images/engage.jpeg'; // Correct path to your engage image
+import logoImage from '../assets/images/net-logo-copy.jpeg'; 
+import backgroundImage from '../assets/images/landingpage.jpg'; 
+import shareImage from '../assets/images/share.jpeg'; 
+import protectImage from '../assets/images/protect.jpeg'; 
+import engageImage from '../assets/images/engage.jpeg'; 
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faAddressBook } from '@fortawesome/free-solid-svg-icons';
 
@@ -18,17 +17,18 @@ const LandingPage = () => {
           <div className="app-bar-links">
             <a href="#contact" className="contact-link">
               <FontAwesomeIcon icon={faAddressBook} size="2x" />
-              <span>CONTACT US</span>
+              <span>Contact Us</span>
             </a>
-            <a href="#about">ABOUT</a>
+            <a href="#about">About</a>
           </div>
           <div className="right-links">
             <Link to="/login">Login</Link>
-            <a href="#login">LOGIN</a>
-            <Link to="/register">REGISTER</Link>
+            <Link to="/register">Register</Link>
           </div>
         </header>
-        <img src={logoImage} alt="Logo" className="logo" />
+        <div className="logo-container">
+          <img src={logoImage} alt="Logo" className="logo-image" />
+        </div>
       </div>
       <div className="section welcome-section">
         <h1>Welcome to The Neighborhood Net</h1>
