@@ -9,6 +9,7 @@ import IncidentPage from './IncidentPage';
 import './App.css';
 import About from './About';
 
+
 const MainLayout = ({ children }) => (
   <>
     <Navigation />
