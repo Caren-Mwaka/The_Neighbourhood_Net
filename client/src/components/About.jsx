@@ -9,7 +9,7 @@ const About = () => {
   return (
     <div className="container">
       <div className="content">
-        <img src={netlogo} alt="Logo" className="logo" /> 
+        <img src={netlogo} alt="Logo" className="aboutlogo" /> 
         <div className="description">
           <p>
             The Neighbourhood Net is a community watch application designed to empower our tight-knit community. It provides a platform to:

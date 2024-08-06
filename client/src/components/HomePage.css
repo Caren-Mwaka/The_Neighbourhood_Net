@@ -19,7 +19,7 @@
     position: relative;
     padding-bottom: 150px;
   }
-   .frame {
+  .frame {
     width: 1068px;
     height: 546px;
     background: linear-gradient(to bottom, #4E958B, #192F2C);
@@ -28,23 +28,15 @@
     align-items: center;
     padding: 20px;
     box-sizing: border-box;
-    position: relative;
+    position: relative; 
     top: -140px;
     border-radius: 20px;
   }
-   .logo-container {
-    position: absolute;
-    bottom: 10px;
-    left: 10px;  
-    z-index: 10; 
-  }
-   .logo {
-    width: 60px;
-    height: auto;
-}
+
 .cards-container {
  display: flex;
  gap: 20px;
+ position: relative;
 }
 .card {
  width: 212px;
