@@ -1,9 +1,15 @@
 import React, { useState } from "react";
 import { useNavigate } from 'react-router-dom';
 import InputField from "./InputField";
-import LoginButton from "./LoginButton";
-import Logo from "./Logo";
 import './login.css'; 
+import logoImage2 from '../assets/images/net-logo-copy.jpeg'; 
+import LoginButton from "./LoginButton";
+
+function Logo() {
+  return (
+    <img src={logoImage2} alt="Logo" className="logocopy" />
+  );
+}
 
 function LoginPage() {
   const [email, setEmail] = useState("");
@@ -67,7 +73,7 @@ function LoginPage() {
         />
       </section>
       <section className="form-section">
-        <Logo className="logo" />
+        <Logo />
         <h1 className="welcome-text">Welcome back!</h1>
         <form className="login-form" onSubmit={handleSubmit}>
           <InputField

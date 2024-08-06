@@ -7,15 +7,15 @@ def seed_db():
         db.drop_all()
         db.create_all()
 
-        # Add initial users
-        user1 = User(name='John Doe', username='john_doe', email='', password=bcrypt.generate_password_hash('Password123!').decode('utf-8'))
-        user2 = User(name='Jane Doe', username='jane_doe', email='jane@example.com', password=bcrypt.generate_password_hash('Password!123').decode('utf-8'))
+        
+        user1 = User(name='Caren Mwaka', username='caren_mwaka', email='caren@example.com', password=bcrypt.generate_password_hash('Password123!').decode('utf-8'))
+        user2 = User(name='Joseph Shonko', username='joseph_shonko', email='shonko@example.com', password=bcrypt.generate_password_hash('Password!123').decode('utf-8'))
         
         db.session.add(user1)
         db.session.add(user2)
         db.session.commit()
 
-        # Add initial events
+        
         event1 = Event(
             name='Community Clean-Up',
             type='Volunteer',

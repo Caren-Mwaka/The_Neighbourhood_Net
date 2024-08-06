@@ -2,10 +2,18 @@ import React from 'react';
 import { createBrowserRouter, RouterProvider } from 'react-router-dom';
 import HomePage from './HomePage';
 import LoginPage from './LoginPage';
-import LandingPage from './LandingPage';  
+import LandingPage from './LandingPage';
+import RegisterPage from './RegisterPage'; // Import the RegisterPage
 import Navigation from './Navigation';
-import IncidentPage from './IncidentPage'; 
+import IncidentPage from './IncidentPage';
 import './App.css';
+
+const MainLayout = ({ children }) => (
+  <>
+    <Navigation />
+    {children}
+  </>
+);
 
 const router = createBrowserRouter([
   {
@@ -17,22 +25,16 @@ const router = createBrowserRouter([
     element: <LoginPage />,  
   },
   {
-    path: '/home',
-    element: (
-      <>
-        <Navigation />
-        <HomePage />
-      </>
-    ),
+    path: '/register',
+    element: <RegisterPage />,
   },
   {
-    path: '/incident-page', 
-    element: (
-      <>
-        <Navigation />
-        <IncidentPage />
-      </>
-    ),
+    path: '/home',
+    element: <MainLayout><HomePage /></MainLayout>,
+  },
+  {
+    path: '/incident-page',
+    element: <MainLayout><IncidentPage /></MainLayout>,
   },
 ]);
 

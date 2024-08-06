@@ -2,31 +2,30 @@ body, html {
     height: 100%;
     margin: 0;
     font-family: Arial, sans-serif;
-  }
-  
-  .section {
+}
+
+.section {
     height: 100vh;
     display: flex;
     flex-direction: column;
     justify-content: center;
     align-items: center;
     position: relative; 
-  }
-  
-  .landing-section {
-    background-image: url('../images/new-background.jpeg'); 
+}
+
+.landing-section {
     background-size: cover;
     background-position: center;
-  }
-  
-  .welcome-section {
+}
+
+.welcome-section {
     background: linear-gradient(to bottom, #4e958b, #192F2C);
     color: white;
     text-align: center;
     padding-top: 70px; 
-  }
-  
-  .app-bar {
+}
+
+.app-bar {
     width: 100%;
     display: flex;
     justify-content: space-between;
@@ -36,88 +35,96 @@ body, html {
     position: absolute;
     top: 0;
     z-index: 10;
-    margin-bottom: 0%;
-  }
-  
-  .app-bar-links {
+}
+
+.app-bar-links {
     display: flex;
     gap: 40px;
     margin-left: 10px;
-  }
-  
-  .right-links {
+}
+
+.right-links {
     display: flex;
     gap: 40px;
-  }
-  
-  .right-links a {
+}
+
+.right-links a, .app-bar-links a {
     color: white;
     text-decoration: none;
     display: flex;
     align-items: center;
-  }
-  
-  .app-bar-links a {
+}
+
+.right-links a {
     color: white;
     text-decoration: none;
     display: flex;
     align-items: center;
-  }
-  
-  .contact-link {
+    cursor: pointer; 
+}
+
+.right-links a:hover {
+    color: #f0f0f0; 
+}
+
+
+.contact-link {
     display: flex;
     align-items: center;
-  }
-  
-  .contact-link span {
+}
+
+.contact-link span {
     margin-left: 10px; 
-  }
-  
-  .logo {
-    position: absolute; 
-    top: 20px; 
-    left: 50%;
-    transform: translateX(-50%);
-    height: 550px; 
-  }
-  
-  .images-container {
+}
+
+.images-container {
     display: flex;
     justify-content: center;
     align-items: flex-end;
     gap: 100px;
     margin-top: 70px;
-  }
-  
-  .image-card {
+}
+
+.image-card {
     overflow: hidden;
     border-radius: 30px;
     width: 250px; 
     height: 750px; 
     position: relative;
-  }
-  
-  .image-card img {
+}
+
+.image-card img {
     width: 100%;
     height: auto; 
-  }
-  
-  .image-caption {
+}
+
+.image-caption {
     padding: 10px;
     font-size: 2em;
     color: black;
     text-align: center;
-  }
-  
-  
-  .image-card.share {
+}
+
+.image-card.share {
     margin-bottom: 20px; 
-  }
-  
-  .image-card.protect {
+}
+
+.image-card.protect {
     margin-bottom: 100px; 
-  }
-  
-  .image-card.engage {
+}
+
+.image-card.engage {
     margin-bottom: 20px; 
-  }
+}
+.logo-container {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    text-align: center;
+}
+
+.logo-image {
+    width: 270px; 
+    height: auto;
+}
