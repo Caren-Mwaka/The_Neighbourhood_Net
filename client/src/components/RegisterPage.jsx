@@ -5,6 +5,7 @@ import { useNavigate } from 'react-router-dom';
 import './RegisterPage.css';
 import backgroundImage from '../assets/images/registration.jpg'; 
 import { FaEye, FaEyeSlash } from 'react-icons/fa'; 
+import { toast } from 'react-toastify';
 
 const RegisterPage = () => {
   const navigate = useNavigate(); 
@@ -47,14 +48,15 @@ const RegisterPage = () => {
 
       if (response.ok) {
         const result = await response.json();
-        console.log('Registration successful', result);
+        toast.success("Registration successful!");
         navigate('/home'); 
       } else {
         const error = await response.json();
-        console.log('Registration failed', error);
+        toast.error("Registration failed. Please try again.");
       }
     } catch (error) {
       console.error('Error:', error);
+      toast.error("An error occurred. Please try again.");
     }
   };
 

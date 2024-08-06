@@ -4,6 +4,7 @@ import InputField from "./InputField";
 import './login.css'; 
 import logoImage2 from '../assets/images/net-logo-copy.jpeg'; 
 import LoginButton from "./LoginButton";
+import { toast } from 'react-toastify';
 
 function Logo() {
   return (
@@ -52,11 +53,11 @@ function LoginPage() {
       }
 
       const data = await response.json();
-      console.log("Login successful:", data);
+      toast.success("Login successful!");
       navigate('/home');
     } catch (error) {
       console.error("Login failed:", error);
-      setErrors({ general: "Login failed. Please try again." });
+      toast.error("Login failed. Please try again.");
     } finally {
       setLoading(false);
     }
