@@ -19,7 +19,7 @@ const LandingPage = () => {
               <FontAwesomeIcon icon={faAddressBook} size="2x" />
               <span>Contact Us</span>
             </a>
-            <a href="#about">About</a>
+            <Link to="/about">About</Link>
           </div>
           <div className="right-links">
             <Link to="/login">Login</Link>

@@ -3,10 +3,11 @@ import { createBrowserRouter, RouterProvider } from 'react-router-dom';
 import HomePage from './HomePage';
 import LoginPage from './LoginPage';
 import LandingPage from './LandingPage';
-import RegisterPage from './RegisterPage'; // Import the RegisterPage
+import RegisterPage from './RegisterPage'; 
 import Navigation from './Navigation';
 import IncidentPage from './IncidentPage';
 import './App.css';
+import About from './About';
 
 const MainLayout = ({ children }) => (
   <>
@@ -27,6 +28,10 @@ const router = createBrowserRouter([
   {
     path: '/register',
     element: <RegisterPage />,
+  },
+  {
+    path: '/about',
+    element: <About />,  
   },
   {
     path: '/home',
