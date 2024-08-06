@@ -1,6 +1,9 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import './Navigation.css'; 
+
+import LogoutButton from './LogoutButton';
+
 const Navigation = () => (
   <nav className="navbar">
     <ul className="nav-links">
@@ -14,7 +17,7 @@ const Navigation = () => (
       </li>
       <li><Link to="/community-forum">Community Forum</Link></li>
       <li><Link to="/about">About</Link></li>
-      <li><button className="logout-button">Logout</button></li>
+      <li><LogoutButton /></li>
     </ul>
   </nav>
 );

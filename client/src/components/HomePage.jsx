@@ -2,7 +2,6 @@ import React from 'react';
 import './HomePage.css'; 
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faUsers, faShieldAlt, faExclamationCircle } from '@fortawesome/free-solid-svg-icons';
-import homelogo from '../assets/neighbourhood-net-logo.png';
 import photo1 from '../assets/events.jpg';
 import photo2 from '../assets/middlephoto.jpg';
 import photo3 from '../assets/teamphoto2.jpg';
