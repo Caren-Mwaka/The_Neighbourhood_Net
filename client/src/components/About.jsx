@@ -3,13 +3,13 @@ import { FaFacebook, FaTwitter, FaInstagram } from 'react-icons/fa';
 import './About.css';
 
 import teamPhoto from '../assets/teamphoto1.jpg';
-import netlogo from '../assets/neighbourhood-net-logo.png'; // Import the logo
+import netlogo from '../assets/neighbourhood-net-logo.png'; 
 
 const About = () => {
   return (
     <div className="container">
       <div className="content">
-        <img src={netlogo} alt="Logo" className="logo" /> {/* Add the logo here */}
+        <img src={netlogo} alt="Logo" className="logo" /> 
         <div className="description">
           <p>
             The Neighbourhood Net is a community watch application designed to empower our tight-knit community. It provides a platform to:
@@ -44,11 +44,6 @@ const About = () => {
           alt="Neighborhood view"
           className="neighborhood-image"
         />
-        <div className="image-text">
-          <p>THE</p> 
-          <p>NEIGHBOURHOOD</p>
-          <p>NET</p>
-        </div>
       </div>
     </div>
   );

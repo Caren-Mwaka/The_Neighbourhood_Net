@@ -20,6 +20,7 @@
     color: #ffffff;
     font-size: 1.2em;
     margin-bottom: 20px; 
+    font-family: 'Outfit', sans-serif;
 }
 
 .social-icons {
@@ -35,13 +36,14 @@
     display: flex;
     align-items: center;
     gap: 5px;
+    font-family: 'Outfit', sans-serif;
 }
 
 .image-container {
     position: relative;
     width: 50%; 
     max-width: 600px; 
-    height: 80vh; 
+    height: 90vh; 
     margin: 20px;
     margin-top: 40px;
     flex-shrink: 0; 
@@ -55,28 +57,21 @@
     object-fit: cover;
 }
 
-.image-text {
-    position: absolute;
-    top: 20px;
-    left: 50%;
-    transform: translateX(-50%);
-    color: #ffffff;
-    font-size: 2em;
-    font-weight: bold;
-    text-align: center;
-    background: rgba(145, 214, 165, 0.5); 
-    padding: 10px 20px;
-    border-radius: 10px; 
-    mix-blend-mode: screen; 
-}
-
 .logo {
-    width: 250px; 
+    width: 200px; 
     height: auto; 
     margin-bottom: 10px; 
     display: block; 
-    margin-left: 110px;
+    margin-left: 150px;
+    padding: 10px; 
+    background: linear-gradient(135deg, #45847b, #192F2C); 
+    border-radius: 15px; 
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+    display: flex; 
+    justify-content: center; 
+    align-items: center; 
 }
+
 
 ul {
     margin: 0;
