@@ -1,7 +1,7 @@
 from flask import Flask, jsonify, request, session
 from flask_migrate import Migrate
 from flask_cors import CORS
-from models import db, User, Event, RSVP, Incident 
+from models import db, User, Event, RSVP, Incident
 from flask_bcrypt import Bcrypt
 from flask_jwt_extended import JWTManager, create_access_token, jwt_required, get_jwt_identity
 from flask_restful import Api, Resource
@@ -27,7 +27,7 @@ def generate_token(user):
 
 @app.route('/logout', methods=['POST'])
 def logout():
-    session.clear()  
+    session.clear()
     return jsonify({"message": "Logged out successfully"}), 200
 
 @app.route('/protected', methods=['GET'])
@@ -57,11 +57,10 @@ class UserResource(Resource):
 
 class RegisterResource(Resource):
     def post(self):
-        name = request.json.get("name") 
+        name = request.json.get("name")
         username = request.json.get("username")
         email = request.json.get("email")
         password = request.json.get("password")
-       
 
         if not username or not email or not password or not name:
             return {"error": "Missing fields"}, 400
@@ -75,13 +74,12 @@ class RegisterResource(Resource):
         db.session.commit()
         return new_user.to_dict(), 201
 
-
 class LoginResource(Resource):
     def post(self):
-        email = request.json.get("email") 
+        email = request.json.get("email")
         password = request.json.get("password")
 
-        user = User.query.filter_by(email=email).first()  
+        user = User.query.filter_by(email=email).first()
         if user and bcrypt.check_password_hash(user.password, password):
             token = generate_token(user)
             return {"message": "Logged in successfully", "token": token}, 200
@@ -167,22 +165,18 @@ class RSVPResource(Resource):
         db.session.delete(rsvp)
         db.session.commit()
         return {'message': 'RSVP deleted'}, 200
-    
+
 class IncidentResource(Resource):
     def get(self, incident_id=None):
         if incident_id:
             incident = Incident.query.get(incident_id)
             if incident:
-                print(f"Found incident: {incident.to_dict()}")
                 return incident.to_dict(), 200
-            print("Incident not found")
             return {"error": "Incident not found"}, 404
 
         incidents = Incident.query.all()
-        incident_list = [incident.to_dict() for incident in incidents]
-        print(f"Incident list: {incident_list}")
-        return {"incidents": incident_list}, 200
-    
+        return {"incidents": [incident.to_dict() for incident in incidents]}, 200
+
     def post(self):
         data = request.json
         name = data.get('name')
@@ -224,7 +218,7 @@ class IncidentResource(Resource):
         db.session.delete(incident)
         db.session.commit()
         return {"message": "Incident deleted"}, 200
-    
+
 api.add_resource(IncidentResource, '/incidents', '/incidents/<int:id>')
 api.add_resource(Index, '/')
 api.add_resource(UserResource, '/users', '/users/<int:user_id>')

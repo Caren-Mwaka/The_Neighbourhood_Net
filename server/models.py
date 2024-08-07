@@ -89,8 +89,8 @@ class RSVP(db.Model):
 
 class Incident(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.String(100), nullable=False)  
-    date = db.Column(db.Date, nullable=False)  
+    name = db.Column(db.String(100), nullable=False) 
+    date = db.Column(db.Date, nullable=False) 
     type = db.Column(db.String(50), nullable=False)
     description = db.Column(db.String(255), nullable=False)
     location = db.Column(db.String(100), nullable=False)
@@ -101,8 +101,8 @@ class Incident(db.Model):
     def to_dict(self):
         return {
             'id': self.id,
-            'name': self.name,  
-            'date': self.date.isoformat(),  
+            'name': self.name, 
+            'date': self.date.isoformat(), 
             'type': self.type,
             'description': self.description,
             'location': self.location,
@@ -110,4 +110,3 @@ class Incident(db.Model):
             'created_at': self.created_at.isoformat(),
             'updated_at': self.updated_at.isoformat()
         }
-
