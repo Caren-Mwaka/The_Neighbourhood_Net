@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import './HomePage.css'; 
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faUsers, faShieldAlt, faExclamationCircle } from '@fortawesome/free-solid-svg-icons';
@@ -6,20 +6,34 @@ import photo1 from '../assets/events.jpg';
 import photo2 from '../assets/middlephoto.jpg';
 import photo3 from '../assets/teamphoto2.jpg';
 
-const Card = ({ imageSrc }) => (
-  <div className="card">
-    <img src={imageSrc} alt="Card Image" className="card-image" />
-  </div>
-);
-
 const HomePage = () => {
+  const [cardIndex, setCardIndex] = useState(0);
+
+  useEffect(() => {
+    const toggleCards = () => {
+      setCardIndex((prevIndex) => (prevIndex + 1) % 3);
+    };
+
+    const intervalId = setInterval(toggleCards, 600000);
+
+    return () => clearInterval(intervalId);
+  }, []);
+
+  const cardImages = [photo1, photo2, photo3];
+  const cardTitles = ['Engage', 'Protect', 'Team'];
+
   return (
     <div className="homepage">
       <div className="frame">
         <div className="cards-container">
-          <Card imageSrc={photo1} />
-          <Card imageSrc={photo2} />
-          <Card imageSrc={photo3} />
+          {cardImages.map((image, index) => (
+            <div
+              key={index}
+              className={`card ${cardIndex === index ? 'card-top' : 'card-back'}`}
+            >
+              <img src={image} alt={`photo${index + 1}`} className="card-image" />
+            </div>
+          ))}
         </div>
       </div>
       <div className="bottom-frames">
