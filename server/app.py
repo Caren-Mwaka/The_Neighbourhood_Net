@@ -168,9 +168,64 @@ class RSVPResource(Resource):
         db.session.commit()
         return {'message': 'RSVP deleted'}, 200
     
+class IncidentResource(Resource):
+    def get(self, incident_id=None):
+        if incident_id:
+            incident = Incident.query.get(incident_id)
+            if incident:
+                print(f"Found incident: {incident.to_dict()}")
+                return incident.to_dict(), 200
+            print("Incident not found")
+            return {"error": "Incident not found"}, 404
 
+        incidents = Incident.query.all()
+        incident_list = [incident.to_dict() for incident in incidents]
+        print(f"Incident list: {incident_list}")
+        return {"incidents": incident_list}, 200
     
+    def post(self):
+        data = request.json
+        name = data.get('name')
+        date = datetime.strptime(data.get('date'), '%Y-%m-%d').date()
+        type_ = data.get('type')
+        priority = data.get('priority')
+        location = data.get('location')
+        description = data.get('description')
 
+        if not name or not date or not type_ or not priority or not location or not description:
+            return {"error": "Missing fields"}, 400
+
+        new_incident = Incident(name=name, date=date, type=type_, priority=priority, location=location, description=description)
+        db.session.add(new_incident)
+        db.session.commit()
+        return new_incident.to_dict(), 201
+
+    def put(self, incident_id):
+        incident = Incident.query.get(incident_id)
+        if not incident:
+            return {"error": "Incident not found"}, 404
+
+        data = request.json
+        incident.name = data.get('name', incident.name)
+        incident.date = datetime.strptime(data.get('date', incident.date), '%Y-%m-%d').date()  
+        incident.type = data.get('type', incident.type)
+        incident.priority = data.get('priority', incident.priority)
+        incident.location = data.get('location', incident.location)
+        incident.description = data.get('description', incident.description)
+
+        db.session.commit()
+        return incident.to_dict(), 200
+
+    def delete(self, incident_id):
+        incident = Incident.query.get(incident_id)
+        if not incident:
+            return {"error": "Incident not found"}, 404
+
+        db.session.delete(incident)
+        db.session.commit()
+        return {"message": "Incident deleted"}, 200
+    
+api.add_resource(IncidentResource, '/incidents', '/incidents/<int:id>')
 api.add_resource(Index, '/')
 api.add_resource(UserResource, '/users', '/users/<int:user_id>')
 api.add_resource(RegisterResource, '/register')

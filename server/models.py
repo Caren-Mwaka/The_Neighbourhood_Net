@@ -87,3 +87,27 @@ class RSVP(db.Model):
             "event": self.event.to_dict()
         }
 
+class Incident(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(100), nullable=False)  
+    date = db.Column(db.Date, nullable=False)  
+    type = db.Column(db.String(50), nullable=False)
+    description = db.Column(db.String(255), nullable=False)
+    location = db.Column(db.String(100), nullable=False)
+    priority = db.Column(db.String(20), nullable=False)
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+
+    def to_dict(self):
+        return {
+            'id': self.id,
+            'name': self.name,  
+            'date': self.date.isoformat(),  
+            'type': self.type,
+            'description': self.description,
+            'location': self.location,
+            'priority': self.priority,
+            'created_at': self.created_at.isoformat(),
+            'updated_at': self.updated_at.isoformat()
+        }
+
