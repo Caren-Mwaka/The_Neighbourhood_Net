@@ -1,51 +1,68 @@
-from app import app, bcrypt
-from models import db, User, Event, RSVP
-from datetime import datetime
+from app import app, db
+from models import User, Event, RSVP, Incident
+from datetime import datetime, time
 
-def seed_db():
-    with app.app_context():
-        db.drop_all()
-        db.create_all()
+# Define some sample data
+users = [
+    {'name': 'Alice Smith', 'username': 'alice', 'email': 'alice@example.com', 'password': 'Password123!'},
+    {'name': 'Bob Johnson', 'username': 'bob', 'email': 'bob@example.com', 'password': 'Password123!'},
+    {'name': 'Charlie Brown', 'username': 'charlie', 'email': 'charlie@example.com', 'password': 'Password123!'},
+]
 
-        
-        user1 = User(name='Caren Mwaka', username='caren_mwaka', email='caren@example.com', password=bcrypt.generate_password_hash('Password123!').decode('utf-8'))
-        user2 = User(name='Joseph Shonko', username='joseph_shonko', email='shonko@example.com', password=bcrypt.generate_password_hash('Password!123').decode('utf-8'))
-        
-        db.session.add(user1)
-        db.session.add(user2)
-        db.session.commit()
+events = [
+    {'name': 'Neighborhood Clean-up', 'type': 'Environmental Hazards', 'date': '2024-08-15', 'time': '10:00', 'location': 'Park', 'image_url': 'http://example.com/image1.jpg'},
+    {'name': 'Community Safety Workshop', 'type': 'Safety Concerns', 'date': '2024-08-20', 'time': '14:00', 'location': 'Community Center', 'image_url': 'http://example.com/image2.jpg'},
+]
 
-        
-        event1 = Event(
-            name='Community Clean-Up',
-            type='Volunteer',
-            date=datetime.strptime('2024-08-10', '%Y-%m-%d'),
-            time=datetime.strptime('10:00:00', '%H:%M:%S').time(),
-            location='Central Park',
-            image_url='http://example.com/cleanup.jpg'
+incidents = [
+    {'name': 'Broken Streetlight', 'date': '2024-08-01', 'type': 'Infrastructure Issues', 'priority': 'high', 'location': 'Main St', 'description': 'The streetlight at Main St and 1st Ave is not working.'},
+    {'name': 'Loud Noise Complaint', 'date': '2024-08-05', 'type': 'Safety Concerns', 'priority': 'medium', 'location': '2nd Ave', 'description': 'Loud music coming from a house on 2nd Ave.'},
+]
+
+# Function to convert time string to datetime.time object
+def parse_time(time_str):
+    if time_str:
+        hours, minutes = map(int, time_str.split(':'))
+        return time(hours, minutes)
+    return None
+
+# Seed the database
+with app.app_context():
+    db.create_all()  
+
+    # Add users
+    for user_data in users:
+        user = User(
+            name=user_data['name'],
+            username=user_data['username'],
+            email=user_data['email'],
+            password=user_data['password']  
         )
-        event2 = Event(
-            name='Yoga in the Park',
-            type='Wellness',
-            date=datetime.strptime('2024-08-12', '%Y-%m-%d'),
-            time=datetime.strptime('08:00:00', '%H:%M:%S').time(),
-            location='Riverside Park',
-            image_url='http://example.com/yoga.jpg'
+        db.session.add(user)
+
+    # Add events
+    for event_data in events:
+        event = Event(
+            name=event_data['name'],
+            type=event_data['type'],
+            date=datetime.strptime(event_data['date'], '%Y-%m-%d').date(),
+            time=parse_time(event_data['time']),  
+            location=event_data['location'],
+            image_url=event_data['image_url']
         )
+        db.session.add(event)
 
-        db.session.add(event1)
-        db.session.add(event2)
-        db.session.commit()
+    # Add incidents
+    for incident_data in incidents:
+        incident = Incident(
+            name=incident_data['name'],
+            date=datetime.strptime(incident_data['date'], '%Y-%m-%d').date(),
+            type=incident_data['type'],
+            priority=incident_data['priority'],
+            location=incident_data['location'],
+            description=incident_data['description']
+        )
+        db.session.add(incident)
 
-        # Add initial RSVP records
-        rsvp1 = RSVP(event_id=event1.id, user_id=user1.id, username=user1.username)  # Use IDs
-        rsvp2 = RSVP(event_id=event2.id, user_id=user2.id, username=user2.username)  # Use IDs
-
-        db.session.add(rsvp1)
-        db.session.add(rsvp2)
-        db.session.commit()
-
-        print("Database seeded successfully!")
-
-if __name__ == '__main__':
-    seed_db()
+    db.session.commit()
+    print("Database seeded successfully!")
