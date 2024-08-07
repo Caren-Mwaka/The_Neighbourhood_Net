@@ -27,7 +27,9 @@ const LandingPage = () => {
           </div>
         </header>
         <div className="logo-container">
+        <div className="logo-background">
           <img src={logoImage} alt="Logo" className="logo-image" />
+          </div>
         </div>
       </div>
       <div className="section welcome-section">

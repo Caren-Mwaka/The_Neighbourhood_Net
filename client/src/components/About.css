@@ -5,6 +5,8 @@
     min-height: 100vh; 
     background-color: #45847b;
     background: linear-gradient(to bottom, #45847b, #192F2C);
+    /* margin-top: 2rem;
+    margin-bottom: 2rem; */
 }
 
 .content {
@@ -21,6 +23,7 @@
     font-size: 1.2em;
     margin-bottom: 20px; 
     font-family: 'Outfit', sans-serif;
+    text-align: left;
 }
 
 .social-icons {
@@ -62,21 +65,22 @@
     height: auto; 
     margin-bottom: 10px; 
     display: block; 
-    margin-left: 150px;
+    margin-left: 0;
     padding: 10px; 
     background: linear-gradient(135deg, #45847b, #192F2C); 
     border-radius: 15px; 
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
     display: flex; 
     justify-content: center; 
-    align-items: center; 
+    align-items: left; 
 }
 
 
 ul {
     margin: 0;
-    padding-left: 20px; 
+    padding-left: 0; 
     list-style-type: disc; 
+    text-align: left;
 }
 
 li {

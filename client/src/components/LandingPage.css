@@ -11,11 +11,14 @@ body, html {
     justify-content: center;
     align-items: center;
     position: relative; 
+    width: 100%;
+    
 }
 
 .landing-section {
     background-size: cover;
     background-position: center;
+    width: 100%;
 }
 
 .welcome-section {
@@ -23,24 +26,30 @@ body, html {
     color: white;
     text-align: center;
     padding-top: 70px; 
+    width: 100%;
 }
 
 .app-bar {
     width: 100%;
     display: flex;
+    max-width: 1729px;
     justify-content: space-between;
     align-items: center;
     padding: 20px;
-    background-color: rgba(34, 80, 79, 0.61); 
+    background-color: rgba(78, 80, 79, 0.5); 
     position: absolute;
     top: 0;
     z-index: 10;
+    /* margin-right: 20px;
+    margin-left: 10px; */
+    
 }
 
 .app-bar-links {
     display: flex;
     gap: 40px;
     margin-left: 10px;
+    
 }
 
 .right-links {
@@ -124,6 +133,11 @@ body, html {
     text-align: center;
 }
 
+.logo-background {
+    background-color: rgba(78, 149, 139, 0.7); 
+    padding: 20px;
+    border-radius: 20px;
+}
 .logo-image {
     width: 270px; 
     height: auto;

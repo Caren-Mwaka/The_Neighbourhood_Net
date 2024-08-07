@@ -1,0 +1,107 @@
+html, body {
+    height: 100%;
+    width: 100%;
+    margin: 0;
+    padding: 0;
+    font-family: 'Arial', sans-serif;
+    background: linear-gradient(to bottom, #4e958b, #192f2c); 
+}
+
+#root {
+    height: 100%;
+}
+
+.report-section {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    padding: 20px;
+    box-sizing: border-box;
+}
+
+.report-container {
+    display: flex;
+    background-color: rgba(0, 0, 0, 0.6);
+    border-radius: 10px;
+    overflow: hidden;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    max-width: 1200px; 
+    width: 100%;
+    margin: 20px; 
+    box-sizing: border-box;
+}
+
+.report-image {
+    width: 50%;
+    background-size: cover;
+    background-position: center;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    padding: 20px;
+}
+
+.report-title {
+    color: #fff;
+    margin-bottom: 10px;
+    text-align: center;
+}
+
+.report-subtitle {
+    color: #fff;
+    text-align: center;
+}
+
+.report-form {
+    width: 50%;
+    padding: 20px;
+    box-sizing: border-box;
+}
+
+.form-title {
+    color: #fff;
+    margin-bottom: 20px;
+    text-align: center;
+}
+
+.btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    padding: 15px;
+    border: none;
+    border-radius: 5px;
+    background-color: #192F2C !important;  
+    color: #004d40;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.btn:hover {
+    background-color: #4e958b !important;  
+}
+
+.MuiInputLabel-shrink {
+    transform: translate(0, -1.5px) scale(0.75);
+    transform-origin: top left;
+}
+
+.incident-list-container {
+    margin-top: 20px;
+    width: 100%;
+    max-width: 1200px;
+}
+
+.incident-card {
+    background-color: rgba(5, 92, 58, 0.6);
+    color: #fff;
+    border-radius: 5px;
+    padding: 10px;
+    margin-top: 10px;
+    box-sizing: border-box;
+}
