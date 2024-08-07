@@ -1,4 +1,4 @@
-from app import app, db
+from app import app, db, bcrypt
 from models import User, Event, RSVP, Incident
 from datetime import datetime, time
 
@@ -32,11 +32,12 @@ with app.app_context():
 
     # Add users
     for user_data in users:
+        hashed_password = bcrypt.generate_password_hash(user_data['password']).decode('utf-8')
         user = User(
             name=user_data['name'],
             username=user_data['username'],
             email=user_data['email'],
-            password=user_data['password']  
+            password=hashed_password  
         )
         db.session.add(user)
 

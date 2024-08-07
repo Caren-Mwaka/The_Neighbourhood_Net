@@ -18,7 +18,7 @@ app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 db.init_app(app)
 bcrypt = Bcrypt(app)
 migrate = Migrate(app, db)
-CORS(app, supports_credentials=True, origins=["http://localhost:5173"])
+CORS(app)
 jwt = JWTManager(app)
 api = Api(app)
 
@@ -78,12 +78,26 @@ class LoginResource(Resource):
     def post(self):
         email = request.json.get("email")
         password = request.json.get("password")
+        
+        print("Email:", email)
+        print("Password:", password)
 
         user = User.query.filter_by(email=email).first()
-        if user and bcrypt.check_password_hash(user.password, password):
-            token = generate_token(user)
-            return {"message": "Logged in successfully", "token": token}, 200
-        return {"error": "Invalid credentials"}, 401
+        if not user:
+            print("User not found")
+            return {"error": "Invalid credentials"}, 401
+
+        if not bcrypt.check_password_hash(user.password, password):
+            print("Password check failed")
+            return {"error": "Invalid credentials"}, 401
+
+        token = generate_token(user)
+        print("Token:", token)
+        return {"message": "Logged in successfully", "token": token}, 200
+
+    
+def generate_token(user):
+    return create_access_token(identity=user.username)
 
 class EventResource(Resource):
     def get(self, event_id=None):

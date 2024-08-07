@@ -1,8 +1,8 @@
 """Add name and date to Incident model
 
-Revision ID: 3c63aafd7c6d
+Revision ID: 61afa769491c
 Revises: 
-Create Date: 2024-08-07 12:23:10.211552
+Create Date: 2024-08-07 14:56:23.456337
 
 """
 from alembic import op
@@ -10,7 +10,7 @@ import sqlalchemy as sa
 
 
 # revision identifiers, used by Alembic.
-revision = '3c63aafd7c6d'
+revision = '61afa769491c'
 down_revision = None
 branch_labels = None
 depends_on = None
