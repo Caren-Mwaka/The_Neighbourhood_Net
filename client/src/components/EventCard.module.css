@@ -1,0 +1,87 @@
+.eventCard {
+  border-radius: 14px;
+  background-color: #d9d9d9;
+  width: 100%;
+  max-width: 800px;
+  margin-top: 25px;
+  padding: 12px;
+  display: flex;
+  gap: 12px;
+  margin-bottom: auto;
+}
+
+.eventImage {
+  width: 200px;
+  border-radius: 14px;
+  aspect-ratio: 1.86;
+  object-fit: cover;
+}
+
+.eventDetails {
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start; /* Align items at the top */
+  color: #000;
+  font: 400 14px Outfit, sans-serif;
+  flex-grow: 1;
+}
+
+.eventName {
+  font-size: 18px;
+  font-weight: 600;
+  margin-bottom: 10px;
+}
+
+.dateWrapper,
+.timeWrapper,
+.locationWrapper {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  margin-bottom: 10px;
+  padding-bottom: 10px; /* Optional: Add margin for spacing */
+}
+
+.dateIcon,
+.timeIcon,
+.locationIcon {
+  width: 20px;
+  height: 25px;
+  object-fit: contain;
+}
+
+.infoWrapper {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin: 10px 0;
+}
+
+.rsvpButton {
+  background-color: #43b9ab;
+  color: #000;
+  padding: 6px 30px;
+  border: none;
+  cursor: pointer;
+  font: inherit;
+  letter-spacing: 1px;
+  border-radius: 4px;
+}
+
+@media (max-width: 500px) {
+  .eventCard {
+    flex-direction: column;
+    padding: 12px;
+    margin-top: 20px;
+  }
+
+  .eventImage {
+    width: 100%;
+    max-width: 200px;
+    margin: 0 auto;
+  }
+
+  .rsvpButton {
+    padding: 6px 20px;
+  }
+}
