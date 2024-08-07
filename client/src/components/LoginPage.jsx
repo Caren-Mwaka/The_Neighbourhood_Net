@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { useNavigate } from 'react-router-dom';
 import InputField from "./InputField";
-import './login.css'; 
+import './LoginPage.css'; 
 import logoImage2 from '../assets/images/net-logo-copy.jpeg'; 
 import LoginButton from "./LoginButton";
 import { toast } from 'react-toastify';

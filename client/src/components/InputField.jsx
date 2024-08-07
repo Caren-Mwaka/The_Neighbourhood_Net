@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { EyeIcon, EyeSlashIcon } from "@heroicons/react/24/outline";
-import './login.css'; 
+import './LoginPage.css'; 
 
 function InputField({
   label,
