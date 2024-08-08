@@ -9,6 +9,7 @@ import IncidentPage from "./IncidentPage";
 import "./App.css";
 import About from "./About";
 import EventsPage from "./EventsPage";
+import AdminDashboard from './AdminDashboard'
 
 const MainLayout = ({ children }) => (
   <>
@@ -25,6 +26,10 @@ const router = createBrowserRouter([
   {
     path: "/login",
     element: <LoginPage />,
+  },
+  {
+    path: "/admin",
+    element: <AdminDashboard />,
   },
   {
     path: "/register",
