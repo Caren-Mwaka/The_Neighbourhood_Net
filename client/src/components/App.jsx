@@ -1,14 +1,14 @@
-import React from 'react';
-import { createBrowserRouter, RouterProvider } from 'react-router-dom';
-import HomePage from './HomePage';
-import LoginPage from './LoginPage';
-import LandingPage from './LandingPage';
-import RegisterPage from './RegisterPage'; 
-import Navigation from './Navigation';
-import IncidentPage from './IncidentPage';
-import './App.css';
-import About from './About';
-
+import React from "react";
+import { createBrowserRouter, RouterProvider } from "react-router-dom";
+import HomePage from "./HomePage";
+import LoginPage from "./LoginPage";
+import LandingPage from "./LandingPage";
+import RegisterPage from "./RegisterPage";
+import Navigation from "./Navigation";
+import IncidentPage from "./IncidentPage";
+import "./App.css";
+import About from "./About";
+import EventsPage from "./EventsPage";
 
 const MainLayout = ({ children }) => (
   <>
@@ -19,28 +19,44 @@ const MainLayout = ({ children }) => (
 
 const router = createBrowserRouter([
   {
-    path: '/',
-    element: <LandingPage />,  
+    path: "/",
+    element: <LandingPage />,
   },
   {
-    path: '/login',
-    element: <LoginPage />,  
+    path: "/login",
+    element: <LoginPage />,
   },
   {
-    path: '/register',
+    path: "/register",
     element: <RegisterPage />,
   },
   {
-    path: '/about',
-    element: <About />,  
+    path: "/about",
+    element: <About />,
   },
   {
-    path: '/home',
-    element: <MainLayout><HomePage /></MainLayout>,
+    path: "/events",
+    element: (
+      <MainLayout>
+        <EventsPage />
+      </MainLayout>
+    ),
   },
   {
-    path: '/incident-page',
-    element: <MainLayout><IncidentPage /></MainLayout>,
+    path: "/home",
+    element: (
+      <MainLayout>
+        <HomePage />
+      </MainLayout>
+    ),
+  },
+  {
+    path: "/incident-page",
+    element: (
+      <MainLayout>
+        <IncidentPage />
+      </MainLayout>
+    ),
   },
 ]);
 
