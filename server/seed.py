@@ -4,9 +4,9 @@ from datetime import datetime, time
 
 # Define some sample data
 users = [
-    {'name': 'Alice Smith', 'username': 'alice', 'email': 'alice@example.com', 'password': 'Password123!'},
-    {'name': 'Bob Johnson', 'username': 'bob', 'email': 'bob@example.com', 'password': 'Password123!'},
-    {'name': 'Charlie Brown', 'username': 'charlie', 'email': 'charlie@example.com', 'password': 'Password123!'},
+    {'name': 'Alice Smith', 'username': 'alice', 'email': 'alice@example.com', 'password': 'Password123!', 'role': 'admin'},
+    {'name': 'Bob Johnson', 'username': 'bob', 'email': 'bob@example.com', 'password': 'Password123!', 'role': 'user'},
+    {'name': 'Charlie Brown', 'username': 'charlie', 'email': 'charlie@example.com', 'password': 'Password123!', 'role': 'user'},
 ]
 
 events = [
@@ -28,7 +28,8 @@ def parse_time(time_str):
 
 # Seed the database
 with app.app_context():
-    db.create_all()  
+    db.drop_all()  # Drop all tables
+    db.create_all()  # Create all tables
 
     # Add users
     for user_data in users:
@@ -37,7 +38,8 @@ with app.app_context():
             name=user_data['name'],
             username=user_data['username'],
             email=user_data['email'],
-            password=hashed_password  
+            password=hashed_password,
+            role=user_data.get('role', 'user')  # Default to 'user' if no role is provided
         )
         db.session.add(user)
 
@@ -47,7 +49,7 @@ with app.app_context():
             name=event_data['name'],
             type=event_data['type'],
             date=datetime.strptime(event_data['date'], '%Y-%m-%d').date(),
-            time=parse_time(event_data['time']),  
+            time=parse_time(event_data['time']),
             location=event_data['location'],
             image_url=event_data['image_url']
         )

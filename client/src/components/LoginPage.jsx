@@ -4,7 +4,8 @@ import InputField from "./InputField";
 import './LoginPage.css'; 
 import logoImage2 from '../assets/images/net-logo-copy.jpeg'; 
 import LoginButton from "./LoginButton";
-import { toast } from 'react-toastify';
+import { toast, ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 function Logo() {
   return (
@@ -24,7 +25,7 @@ function LoginPage() {
     e.preventDefault();
     setLoading(true);
     setErrors({});
-
+  
     const newErrors = {};
     if (!email) newErrors.email = "Email is required";
     if (!password) newErrors.password = "Password is required";
@@ -32,13 +33,13 @@ function LoginPage() {
       newErrors.confirmPassword = "Please confirm your password";
     if (password !== confirmPassword)
       newErrors.confirmPassword = "Passwords do not match";
-
+  
     if (Object.keys(newErrors).length > 0) {
       setErrors(newErrors);
       setLoading(false);
       return;
     }
-
+  
     try {
       const response = await fetch("http://localhost:5555/login", {
         method: "POST",
@@ -47,14 +48,22 @@ function LoginPage() {
         },
         body: JSON.stringify({ email, password }),
       });
-
-      if (!response.ok) {
-        throw new Error("Login failed");
-      }
-
+  
       const data = await response.json();
+  
+      if (!response.ok) {
+        throw new Error(data.error || "Login failed");
+      }
+  
       toast.success("Login successful!");
-      navigate('/home');
+      localStorage.setItem("token", data.token);
+      localStorage.setItem("role", data.role);
+  
+      if (data.role === 'admin') {
+        navigate('/admin');
+      } else {
+        navigate('/home');
+      }
     } catch (error) {
       console.error("Login failed:", error);
       toast.error("Login failed. Please try again.");
@@ -62,7 +71,7 @@ function LoginPage() {
       setLoading(false);
     }
   };
-
+  
   return (
     <main className="main-container">
       <section className="image-section">
@@ -105,6 +114,7 @@ function LoginPage() {
           )}
           <LoginButton loading={loading} />
         </form>
+        <ToastContainer />
       </section>
     </main>
   );

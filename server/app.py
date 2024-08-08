@@ -8,6 +8,7 @@ from flask_restful import Api, Resource
 from werkzeug.exceptions import NotFound
 from datetime import datetime
 
+
 app = Flask(__name__)
 
 app.config['SECRET_KEY'] = 'your-unique-secret-key'
@@ -91,13 +92,8 @@ class LoginResource(Resource):
             print("Password check failed")
             return {"error": "Invalid credentials"}, 401
 
-        token = generate_token(user)
-        print("Token:", token)
-        return {"message": "Logged in successfully", "token": token}, 200
-
-    
-def generate_token(user):
-    return create_access_token(identity=user.username)
+        token = create_access_token(identity={'username': user.username, 'role': user.role})
+        return {"message": "Logged in successfully", "token": token, "role": user.role}, 200
 
 class EventResource(Resource):
     def get(self, event_id=None):

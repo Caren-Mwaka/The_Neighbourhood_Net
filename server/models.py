@@ -11,6 +11,7 @@ class User(db.Model):
     username = db.Column(db.String(80), nullable=False, unique=True)
     email = db.Column(db.String(120), nullable=False, unique=True)
     password = db.Column(db.String(255), nullable=False)
+    role = db.Column(db.String(20), nullable=False, default='user') 
     created_at = db.Column(db.DateTime, nullable=False, default=db.func.current_timestamp())
     
     rsvps = db.relationship('RSVP', back_populates='user', cascade='all, delete-orphan')
@@ -41,10 +42,10 @@ class User(db.Model):
             "id": self.id,
             "username": self.username,
             "email": self.email,
+            "role": self.role,  # Added role here
             "created_at": self.created_at.isoformat(),
             "events": [event.id for event in self.events]
         }
-
 
 class Event(db.Model):
     id = db.Column(db.Integer, primary_key=True)
