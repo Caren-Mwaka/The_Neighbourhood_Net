@@ -8,8 +8,11 @@ import Navigation from "./Navigation";
 import IncidentPage from "./IncidentPage";
 import "./App.css";
 import About from "./About";
-import EventsPage from "./EventsPage";
+import EventsList from "./EventsList";
 import AdminDashboard from './AdminDashboard'
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
+
 
 const MainLayout = ({ children }) => (
   <>
@@ -43,7 +46,7 @@ const router = createBrowserRouter([
     path: "/events",
     element: (
       <MainLayout>
-        <EventsPage />
+        <EventsList />
       </MainLayout>
     ),
   },
@@ -69,6 +72,7 @@ const App = () => {
   return (
     <div className="App">
       <RouterProvider router={router} />
+      <ToastContainer />
     </div>
   );
 };

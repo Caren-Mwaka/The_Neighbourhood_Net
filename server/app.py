@@ -19,7 +19,7 @@ app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 db.init_app(app)
 bcrypt = Bcrypt(app)
 migrate = Migrate(app, db)
-CORS(app)
+CORS(app, supports_credentials=True )
 jwt = JWTManager(app)
 api = Api(app)
 
@@ -118,7 +118,14 @@ class EventResource(Resource):
         if not name or not type_ or not date or not time or not location:
             return {"error": "Missing fields"}, 400
 
-        new_event = Event(name=name, type=type_, date=date, time=time, location=location, image_url=image_url)
+        new_event = Event(
+            name=name, 
+            type=type_, 
+            date=datetime.strptime(date, '%Y-%m-%d').date(), 
+            time=parse_time(time), 
+            location=location, 
+            image_url=image_url
+        )
         db.session.add(new_event)
         db.session.commit()
         return new_event.to_dict(), 201
