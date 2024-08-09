@@ -1,7 +1,9 @@
+
 import re
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy.orm import validates
-from datetime import datetime
+from sqlalchemy.event import listens_for
+from datetime import datetime, time
 
 db = SQLAlchemy()
 
@@ -13,8 +15,8 @@ class User(db.Model):
     password = db.Column(db.String(255), nullable=False)
     role = db.Column(db.String(20), nullable=False, default='user') 
     created_at = db.Column(db.DateTime, nullable=False, default=db.func.current_timestamp())
-    
-    rsvps = db.relationship('RSVP', back_populates='user', cascade='all, delete-orphan')
+
+    rsvps = db.relationship('RSVP', back_populates='user', cascade='all, delete-orphan', overlaps='events')
     events = db.relationship('Event', secondary='rsvp', back_populates='users', overlaps='rsvps')
 
     @validates('email')
@@ -57,7 +59,8 @@ class Event(db.Model):
     image_url = db.Column(db.String(200))
 
     rsvps = db.relationship('RSVP', back_populates='event', lazy=True, overlaps='users')
-    users = db.relationship('User', secondary='rsvp', back_populates='events')
+    users = db.relationship('User', secondary='rsvp', back_populates='events', overlaps='rsvps')
+
     def to_dict(self):
         return {
             "id": self.id,
@@ -70,23 +73,31 @@ class Event(db.Model):
             "users": [user.id for user in self.users]
         }
 
-
 class RSVP(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    event_id = db.Column(db.Integer, db.ForeignKey('event.id'), nullable=False)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
-    username = db.Column(db.String(80), nullable=False)  
+    event_id = db.Column(db.Integer, db.ForeignKey('event.id'), nullable=False)
+    created_at = db.Column(db.DateTime, nullable=False, default=db.func.current_timestamp())
+    
+    user_name = db.Column(db.String(80), nullable=False)
+    event_name = db.Column(db.String(120), nullable=False)
+
     user = db.relationship('User', back_populates='rsvps', overlaps='events')
     event = db.relationship('Event', back_populates='rsvps', overlaps='users')
 
-    def to_dict(self):
-        return {
-            "id": self.id,
-            "event_id": self.event_id,
-            "user_id": self.user_id,
-            "username": self.username,  
-            "event": self.event.to_dict()
-        }
+    __table_args__ = (
+        db.UniqueConstraint('user_id', 'event_id', name='unique_user_event'),
+    )
+
+@listens_for(RSVP, 'before_insert')
+@listens_for(RSVP, 'before_update')
+def update_rsvp_names(mapper, connection, target):
+    user = User.query.get(target.user_id)
+    event = Event.query.get(target.event_id)
+    if user:
+        target.user_name = user.username
+    if event:
+        target.event_name = event.name
 
 class Incident(db.Model):
     id = db.Column(db.Integer, primary_key=True)
