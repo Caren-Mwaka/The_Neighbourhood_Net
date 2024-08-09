@@ -9,6 +9,7 @@ import IncidentPage from "./IncidentPage";
 import "./App.css";
 import About from "./About";
 import EventsPage from "./EventsPage";
+import Profile from "./Profile";
 
 const MainLayout = ({ children }) => (
   <>
@@ -39,6 +40,14 @@ const router = createBrowserRouter([
     element: (
       <MainLayout>
         <EventsPage />
+      </MainLayout>
+    ),
+  },
+  {
+    path: "/profile",
+    element: (
+      <MainLayout>
+        <Profile />
       </MainLayout>
     ),
   },
