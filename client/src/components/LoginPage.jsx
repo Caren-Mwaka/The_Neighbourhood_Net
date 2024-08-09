@@ -4,7 +4,7 @@ import InputField from "./InputField";
 import './LoginPage.css'; 
 import logoImage2 from '../assets/images/net-logo-copy.jpeg'; 
 import LoginButton from "./LoginButton";
-import { toast, ToastContainer } from 'react-toastify';
+import { toast} from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 
 function Logo() {
@@ -114,7 +114,6 @@ function LoginPage() {
           )}
           <LoginButton loading={loading} />
         </form>
-        <ToastContainer />
       </section>
     </main>
   );

@@ -42,7 +42,7 @@ class User(db.Model):
             "id": self.id,
             "username": self.username,
             "email": self.email,
-            "role": self.role,  # Added role here
+            "role": self.role, 
             "created_at": self.created_at.isoformat(),
             "events": [event.id for event in self.events]
         }

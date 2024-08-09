@@ -1,23 +1,30 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
-import { toast } from 'react-toastify';
+import { toast} from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 const LogoutButton = () => {
   const navigate = useNavigate();
 
   const handleLogout = async () => {
+    console.log('Logout button clicked');
     try {
-      
       const response = await fetch('http://localhost:5555/logout', {
         method: 'POST',
-        credentials: 'include', 
+        credentials: 'include',
+        headers: {
+          'Content-Type': 'application/json'
+        }
       });
+
+      console.log('Logout response:', response);
 
       if (response.ok) {
         toast.success('Logged out successfully!');
-        navigate('/'); 
+        navigate('/');
       } else {
-        toast.error('Logout failed. Please try again.');
+        const errorData = await response.json();
+        toast.error(`Logout failed: ${errorData.message}`);
       }
     } catch (error) {
       console.error('Logout error:', error);
@@ -26,9 +33,11 @@ const LogoutButton = () => {
   };
 
   return (
-    <button onClick={handleLogout} className="logout-button">
-      Logout
-    </button>
+    <div>
+      <button onClick={handleLogout} className="logout-button">
+        Logout
+      </button>
+    </div>
   );
 };
 
