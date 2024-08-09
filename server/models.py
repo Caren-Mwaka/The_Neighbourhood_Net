@@ -1,17 +1,25 @@
 import re
+from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy.orm import validates
 
-db = SQLAlchemy()
+# Initialize Flask application
+app = Flask(__name__)
 
+# Configure SQLAlchemy
+app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///app.db'
+app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+db = SQLAlchemy(app)
+
+# Models
 class User(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.String(255), nullable=False) 
+    name = db.Column(db.String(255), nullable=False)
     username = db.Column(db.String(80), nullable=False, unique=True)
     email = db.Column(db.String(120), nullable=False, unique=True)
     password = db.Column(db.String(255), nullable=False)
     created_at = db.Column(db.DateTime, nullable=False, default=db.func.current_timestamp())
-    
+
     rsvps = db.relationship('RSVP', back_populates='user', cascade='all, delete-orphan')
     events = db.relationship('Event', secondary='rsvp', back_populates='users')
 
@@ -44,7 +52,6 @@ class User(db.Model):
             "events": [event.id for event in self.events]
         }
 
-
 class Event(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(100), nullable=False)
@@ -68,12 +75,11 @@ class Event(db.Model):
             "users": [user.id for user in self.users]
         }
 
-
 class RSVP(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     event_id = db.Column(db.Integer, db.ForeignKey('event.id'), nullable=False)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
-    username = db.Column(db.String(80), nullable=False)  # Add username field
+    username = db.Column(db.String(80), nullable=False)
     user = db.relationship('User', back_populates='rsvps')
     event = db.relationship('Event', back_populates='rsvps')
 
@@ -82,7 +88,23 @@ class RSVP(db.Model):
             "id": self.id,
             "event_id": self.event_id,
             "user_id": self.user_id,
-            "username": self.username,  # Include username in dict
+            "username": self.username,
             "event": self.event.to_dict()
         }
 
+class ContactMessage(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    full_name = db.Column(db.String(100), nullable=False)
+    email = db.Column(db.String(120), nullable=False)
+    message = db.Column(db.Text, nullable=False)
+
+    def __repr__(self):
+        return f'<ContactMessage {self.full_name}>'
+
+# Database initialization
+with app.app_context():
+    db.create_all()
+
+# Running the app
+if __name__ == '__main__':
+    app.run(debug=True, port=5000)
