@@ -22,6 +22,17 @@ events = [
     {'name': 'Cultural Dance Showcase', 'type': 'arts', 'date': '2024-08-25', 'time': '17:00', 'location': 'National Theatre', 'image_url': 'https://images.pexels.com/photos/2170387/pexels-photo-2170387.jpeg?auto=compress&cs=tinysrgb&w=600'}
 ]
 
+rsvps = [
+    {'user_id': 1, 'event_id': 1},
+    {'user_id': 2, 'event_id': 2},
+    {'user_id': 3, 'event_id': 3},
+    {'user_id': 1, 'event_id': 4},
+    {'user_id': 2, 'event_id': 5},
+    {'user_id': 3, 'event_id': 6},
+    {'user_id': 1, 'event_id': 7},
+    {'user_id': 2, 'event_id': 8},
+]
+
 incidents = [
     {'name': 'Broken Streetlight', 'date': '2024-08-01', 'type': 'Infrastructure Issues', 'priority': 'high', 'location': 'Main St', 'description': 'The streetlight at Main St and 1st Ave is not working.'},
     {'name': 'Loud Noise Complaint', 'date': '2024-08-05', 'type': 'Safety Concerns', 'priority': 'medium', 'location': '2nd Ave', 'description': 'Loud music coming from a house on 2nd Ave.'},
@@ -57,7 +68,10 @@ with app.app_context():
             image_url=event_data['image_url']
         ))
 
-    
+    for rsvp_data in rsvps:
+            rsvp = RSVP(**rsvp_data)
+            db.session.add(rsvp)
+
     for incident_data in incidents:
         db.session.add(Incident(
             name=incident_data['name'],

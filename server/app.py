@@ -157,31 +157,89 @@ class EventResource(Resource):
 
 class RSVPResource(Resource):
     @jwt_required()
+    @jwt_required()
     def post(self):
         data = request.get_json()
-        event_id = data.get('event_id')
+        event_id = data.get('eventId')
 
         if not event_id:
             return {'error': 'Invalid data'}, 400
 
-        user = User.query.filter_by(username=get_jwt_identity()).first()
+        jwt_identity = get_jwt_identity()
+        username = jwt_identity.get('username')
+
+        if not username:
+            return {'error': 'User not found'}, 404
+
+        user = User.query.filter_by(username=username).first()
         if not user:
             return {'error': 'User not found'}, 404
 
-        rsvp = RSVP(event_id=event_id, user_id=user.id, username=user.username)
-        db.session.add(rsvp)
+        existing_rsvp = RSVP.query.filter_by(user_id=user.id, event_id=event_id).first()
+        if existing_rsvp:
+            return {'message': 'You have already RSVP-ed to this event'}, 400
+
+        new_rsvp = RSVP(user_id=user.id, event_id=event_id)
+        db.session.add(new_rsvp)
         db.session.commit()
-        return {'message': 'RSVP successful'}, 201
+        return {'message': 'RSVP successful'}, 200
+    
+    @jwt_required()
+    def get(self, user_id=None):
+        if user_id:
+            user = User.query.get(user_id)
+            if user:
+                return user.to_dict(), 200
+            return {"error": "User not found"}, 404
+        
+        username = request.args.get('username')
+        if username:
+            user = User.query.filter_by(username=username).first()
+            if user:
+                return user.to_dict(), 200
+            return {"error": "User not found"}, 404
+
+        users = User.query.all()
+        return {"users": [user.to_dict() for user in users]}, 200
+
+    @jwt_required()
+    def put(self, rsvp_id):
+        jwt_identity = get_jwt_identity()
+        username = jwt_identity.get('username')
+        
+        user = User.query.filter_by(username=username).first()
+        if not user:
+            return {'error': 'User not found'}, 404
+
+        rsvp = RSVP.query.get(rsvp_id)
+        if not rsvp or rsvp.user_id != user.id:
+            return {'error': 'RSVP not found or access denied'}, 404
+
+        data = request.get_json()
+        event_id = data.get('eventId')
+        
+        if event_id:
+            rsvp.event_id = event_id
+        
+        db.session.commit()
+        return {'message': 'RSVP updated successfully'}, 200
 
     @jwt_required()
     def delete(self, rsvp_id):
+        jwt_identity = get_jwt_identity()
+        username = jwt_identity.get('username')
+        
+        user = User.query.filter_by(username=username).first()
+        if not user:
+            return {'error': 'User not found'}, 404
+
         rsvp = RSVP.query.get(rsvp_id)
-        if not rsvp:
-            return {'error': 'RSVP not found'}, 404
+        if not rsvp or rsvp.user_id != user.id:
+            return {'error': 'RSVP not found or access denied'}, 404
 
         db.session.delete(rsvp)
         db.session.commit()
-        return {'message': 'RSVP deleted'}, 200
+        return {'message': 'RSVP deleted successfully'}, 200
 
 class IncidentResource(Resource):
     def get(self, incident_id=None):

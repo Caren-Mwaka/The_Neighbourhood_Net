@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import './EventsList.css';
 import headerimage from "../assets/friends.jpg";
-
+import { toast } from 'react-toastify';
 
 const defaultImages = {
   sports: "https://images.pexels.com/photos/1263426/pexels-photo-1263426.jpeg?auto=compress&cs=tinysrgb&w=600",
@@ -13,8 +13,8 @@ const defaultImages = {
   tech: "https://plus.unsplash.com/premium_photo-1661540865559-56bc639e539e?w=500&auto=format&fit=crop&q=60&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8OXx8dGVjaCUyMGV2ZW50fGVufDB8fDB8fHww",
   youth: "https://images.pexels.com/photos/5935240/pexels-photo-5935240.jpeg?auto=compress&cs=tinysrgb&w=600",
   religious: "https://plus.unsplash.com/premium_photo-1702058277923-c93281398c83?w=500&auto=format&fit=crop&q=60&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8NXx8Y2h1cmNoJTIwZXZlbnQlMjAlMkIlMjBibGFjayUyMGNvbW11bml0eXxlbnwwfHwwfHx8MA%3D%3D",
-  environment:"https://images.pexels.com/photos/4505447/pexels-photo-4505447.jpeg?auto=compress&cs=tinysrgb&w=600",
-  all: '/"https://images.pexels.com/photos/3611077/pexels-photo-3611077.jpeg?auto=compress&cs=tinysrgb&w=600"', 
+  environment: "https://images.pexels.com/photos/4505447/pexels-photo-4505447.jpeg?auto=compress&cs=tinysrgb&w=600",
+  all: 'https://images.pexels.com/photos/3611077/pexels-photo-3611077.jpeg?auto=compress&cs=tinysrgb&w=600',
 };
 
 const Event = ({ event, onRSVP }) => {
@@ -33,14 +33,13 @@ const Event = ({ event, onRSVP }) => {
   );
 };
 
-
 const EventHeader = () => {
   return (
     <header className="header">
       <img src={headerimage} alt="Events Header" className="header-image" />
       <div className="header-text">
-        <h1>"Stay Connected,"</h1>
-        <h1>"Join Upcoming Events."</h1>
+        <h1>Stay Connected</h1>
+        <h1>Join Upcoming Events</h1>
       </div>
     </header>
   );
@@ -51,54 +50,64 @@ const EventsList = () => {
   const [category, setCategory] = useState('all');
   const [currentPage, setCurrentPage] = useState(1);
   const [eventsPerPage] = useState(5);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState('');
 
   useEffect(() => {
     const fetchEvents = async () => {
+      setLoading(true);
       try {
-        const response = await fetch(`http://localhost:5555/events`);
+        const response = await fetch('http://localhost:5555/events');
         if (!response.ok) {
           throw new Error('Network response was not ok');
         }
         const data = await response.json();
         let filteredEvents = data.events;
-  
+
         if (category !== 'all') {
           filteredEvents = data.events.filter(event => event.type === category);
         }
-  
+
         setEvents(filteredEvents);
+        toast.success('Events loaded successfully'); 
       } catch (error) {
+        setError('Failed to fetch events.');
         console.error('Fetch events error:', error);
+        toast.error('Failed to load events'); 
+      } finally {
+        setLoading(false);
       }
     };
-  
+
     fetchEvents();
   }, [category]);
-  
 
-  const handleRSVP = async (eventId) => {
+  async function handleRSVP(eventId) {
+    const token = localStorage.getItem('token'); 
+    
     try {
-      const response = await fetch('http://localhost:5555/rsvp', {
+      const response = await fetch(`http://127.0.0.1:5555/rsvp`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': `Bearer ${localStorage.getItem('token')}`, 
+          'Authorization': `Bearer ${token}`
         },
-        body: JSON.stringify({ event_id: eventId }),
+        body: JSON.stringify({ eventId }) 
       });
+  
       if (!response.ok) {
-        throw new Error('Network response was not ok');
+        throw new Error(`Network response was not ok: ${response.statusText}`);
       }
+  
       const data = await response.json();
-      console.log(data); 
-      alert('RSVP successful');
+      console.log('RSVP successful:', data);
+      toast.success('RSVP successful'); 
     } catch (error) {
-      console.error('RSVP error:', error); 
-      alert('RSVP failed');
+      console.error('RSVP error:', error);
+      toast.error('RSVP failed'); 
     }
-  };
+  }
 
- 
   const indexOfLastEvent = currentPage * eventsPerPage;
   const indexOfFirstEvent = indexOfLastEvent - eventsPerPage;
   const currentEvents = events.slice(indexOfFirstEvent, indexOfLastEvent);
@@ -127,6 +136,8 @@ const EventsList = () => {
           <option value="environment">Environment</option>
           <option value="religious">Religious</option>
         </select>
+        {loading && <p>Loading events...</p>}
+        {error && <p>{error}</p>}
         <div className="events-list">
           {currentEvents.map((event) => (
             <Event key={event.id} event={event} onRSVP={handleRSVP} />
