@@ -6,6 +6,7 @@ html, body {
     padding: 0;
     font-family: 'Arial', sans-serif;
     background: linear-gradient(to bottom, #4e958b, #192f2c); 
+    overflow: hidden;
 }
 
 #root {
@@ -16,8 +17,8 @@ html, body {
     display: flex;
     flex-direction: row;
     justify-content: center;
-    align-items: flex-start;
-    min-height: 100vh;
+    align-items: center; 
+    min-height: auto; 
     padding: 20px;
     box-sizing: border-box;
 }
@@ -93,14 +94,17 @@ html, body {
 }
 
 .incident-list-container {
-    width: 40%; 
+    width: 40%;
     margin: 20px;
-    max-width: 40%; 
+    max-width: 40%;
     background-color: transparent;
     border-radius: 10px;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
     padding: 10px;
+    max-height: 80vh; 
+    overflow-y: auto; 
 }
+
 
 .incident-card {
     background-color: #192F2C;
@@ -145,7 +149,7 @@ html, body {
     display: flex;
     justify-content: space-between;
     margin-top: 20px;
-    background-color: transparent; /* Ensure no background color */
+    background-color: transparent; 
     padding: 10px;
     border-radius: 5px;
     width: 100%; 
@@ -153,20 +157,21 @@ html, body {
 }
 
 .pagination-container button {
-    color: #fff; /* White text for visibility */
-    background-color: rgba(0, 0, 0, 0.6); /* Match button background with incident cards */
+    color: #fff; 
+    background-color: rgba(0, 0, 0, 0.6); 
     border: none;
     padding: 10px 20px;
     border-radius: 5px;
     cursor: pointer;
     transition: background-color 0.3s ease;
+   
 }
 
 .pagination-container button:hover {
-    background-color: #4e958b; /* Darker green on hover */
+    background-color: #4e958b; 
 }
 
 .pagination-container button:disabled {
-    background-color: rgba(0, 0, 0, 0.3); /* Disabled button style */
+    background-color: rgba(0, 0, 0, 0.3); 
     cursor: not-allowed;
 }

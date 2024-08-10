@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { Box, TextField, Button, Typography, MenuItem, InputAdornment, FormControl, InputLabel, Select, IconButton } from '@mui/material';
 import { Shield, CalendarToday, FilterList } from '@mui/icons-material';
@@ -100,7 +99,7 @@ function IncidentPage() {
             validationSchema={validationSchema}
             onSubmit={handleSubmit}
           >
-            {({ isSubmitting }) => (
+            {({ errors, touched, isSubmitting }) => (
               <Form noValidate autoComplete="off">
                 <FormControl fullWidth margin="normal" variant="outlined">
                   <Field
@@ -114,7 +113,7 @@ function IncidentPage() {
                     }}
                     style={{ backgroundColor: '#fff' }}
                     helperText={<ErrorMessage name="name" />}
-                    error={!!<ErrorMessage name="name" />}
+                    error={Boolean(errors.name && touched.name)}
                   />
                 </FormControl>
                 <FormControl fullWidth margin="normal" variant="outlined">
@@ -138,7 +137,7 @@ function IncidentPage() {
                     }}
                     style={{ backgroundColor: '#fff' }}
                     helperText={<ErrorMessage name="date" />}
-                    error={!!<ErrorMessage name="date" />}
+                    error={Boolean(errors.date && touched.date)}
                   />
                 </FormControl>
                 <Box display="flex" justifyContent="space-between">
@@ -150,6 +149,7 @@ function IncidentPage() {
                       label="Incident type"
                       variant="outlined"
                       style={{ backgroundColor: '#fff', color: '#000' }}
+                      error={Boolean(errors.type && touched.type)}
                     >
                       <MenuItem value="safety">Safety Concerns</MenuItem>
                       <MenuItem value="environmental">Environmental Hazards</MenuItem>
@@ -167,6 +167,7 @@ function IncidentPage() {
                       label="Priority level"
                       variant="outlined"
                       style={{ backgroundColor: '#fff', color: '#000' }}
+                      error={Boolean(errors.priority && touched.priority)}
                     >
                       <MenuItem value="high">High</MenuItem>
                       <MenuItem value="medium">Medium</MenuItem>
@@ -187,7 +188,7 @@ function IncidentPage() {
                     }}
                     style={{ backgroundColor: '#fff' }}
                     helperText={<ErrorMessage name="location" />}
-                    error={!!<ErrorMessage name="location" />}
+                    error={Boolean(errors.location && touched.location)}
                   />
                 </FormControl>
                 <FormControl fullWidth margin="normal" variant="outlined">
@@ -204,7 +205,7 @@ function IncidentPage() {
                     }}
                     style={{ backgroundColor: '#fff' }}
                     helperText={<ErrorMessage name="description" />}
-                    error={!!<ErrorMessage name="description" />}
+                    error={Boolean(errors.description && touched.description)}
                   />
                 </FormControl>
                 <Button
