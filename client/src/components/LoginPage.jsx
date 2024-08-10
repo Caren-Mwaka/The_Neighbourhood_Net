@@ -1,16 +1,14 @@
 import React, { useState } from "react";
-import { useNavigate } from 'react-router-dom';
+import { useNavigate } from "react-router-dom";
 import InputField from "./InputField";
-import './LoginPage.css'; 
-import logoImage2 from '../assets/images/net-logo-copy.jpeg'; 
+import "./LoginPage.css";
+import logoImage2 from "../assets/images/net-logo-copy.jpeg";
 import LoginButton from "./LoginButton";
-import { toast} from 'react-toastify';
-import 'react-toastify/dist/ReactToastify.css';
+import { toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 function Logo() {
-  return (
-    <img src={logoImage2} alt="Logo" className="logocopy" />
-  );
+  return <img src={logoImage2} alt="Logo" className="logocopy" />;
 }
 
 function LoginPage() {
@@ -25,7 +23,7 @@ function LoginPage() {
     e.preventDefault();
     setLoading(true);
     setErrors({});
-  
+
     const newErrors = {};
     if (!email) newErrors.email = "Email is required";
     if (!password) newErrors.password = "Password is required";
@@ -33,13 +31,13 @@ function LoginPage() {
       newErrors.confirmPassword = "Please confirm your password";
     if (password !== confirmPassword)
       newErrors.confirmPassword = "Passwords do not match";
-  
+
     if (Object.keys(newErrors).length > 0) {
       setErrors(newErrors);
       setLoading(false);
       return;
     }
-  
+
     try {
       const response = await fetch("http://localhost:5555/login", {
         method: "POST",
@@ -48,21 +46,22 @@ function LoginPage() {
         },
         body: JSON.stringify({ email, password }),
       });
-  
+
       const data = await response.json();
-  
+
       if (!response.ok) {
         throw new Error(data.error || "Login failed");
       }
-  
+
       toast.success("Login successful!");
       localStorage.setItem("token", data.token);
+      localStorage.setItem("refreshToken", data.refreshToken); 
       localStorage.setItem("role", data.role);
-  
-      if (data.role === 'admin') {
-        navigate('/admin');
+
+      if (data.role === "admin") {
+        navigate("/admin");
       } else {
-        navigate('/home');
+        navigate("/home");
       }
     } catch (error) {
       console.error("Login failed:", error);
@@ -71,7 +70,7 @@ function LoginPage() {
       setLoading(false);
     }
   };
-  
+
   return (
     <main className="main-container">
       <section className="image-section">
@@ -109,9 +108,7 @@ function LoginPage() {
             onChange={(e) => setConfirmPassword(e.target.value)}
             error={errors.confirmPassword}
           />
-          {errors.general && (
-            <div className="error-text">{errors.general}</div>
-          )}
+          {errors.general && <div className="error-text">{errors.general}</div>}
           <LoginButton loading={loading} />
         </form>
       </section>

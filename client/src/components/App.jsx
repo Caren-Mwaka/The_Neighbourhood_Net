@@ -9,6 +9,7 @@ import IncidentPage from "./IncidentPage";
 import "./App.css";
 import About from "./About";
 import EventsList from "./EventsList";
+import NotificationList from "./NotificationList";
 import AdminDashboard from './AdminDashboard'
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
@@ -63,6 +64,14 @@ const router = createBrowserRouter([
     element: (
       <MainLayout>
         <IncidentPage />
+      </MainLayout>
+    ),
+  },
+  {
+    path: "/notifications",
+    element: (
+      <MainLayout>
+        <NotificationList/>
       </MainLayout>
     ),
   },

@@ -42,6 +42,7 @@ class User(db.Model):
     def to_dict(self):
         return {
             "id": self.id,
+            "name": self.name,
             "username": self.username,
             "email": self.email,
             "role": self.role, 
@@ -121,4 +122,19 @@ class Incident(db.Model):
             'priority': self.priority,
             'created_at': self.created_at.isoformat(),
             'updated_at': self.updated_at.isoformat()
+        }
+
+class Notification(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    title = db.Column(db.String(100), nullable=False)
+    message = db.Column(db.String(500), nullable=False)
+    date = db.Column(db.Date, nullable=False, default=datetime.utcnow)
+   
+
+    def to_dict(self):
+        return {
+            'id': self.id,
+            'title': self.title,
+            'message': self.message, 
+            'date': self.date.isoformat()
         }

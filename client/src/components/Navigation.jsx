@@ -16,6 +16,7 @@ const Navigation = () => (
         <span>Net</span>
       </li>
       <li><Link to="/community-forum">Community Forum</Link></li>
+      <li><Link to="/notifications">Notifications</Link></li>
       <li><Link to="/about">About</Link></li>
       <li><LogoutButton /></li>
     </ul>
