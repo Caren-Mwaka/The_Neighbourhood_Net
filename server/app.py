@@ -1,7 +1,7 @@
 from flask import Flask, jsonify, request, session
 from flask_migrate import Migrate
 from flask_cors import CORS
-from models import db, User, Event, RSVP, Incident
+from models import db, User, Event, RSVP, Incident, Notification
 from flask_bcrypt import Bcrypt
 from flask_jwt_extended import JWTManager, create_access_token, jwt_required, get_jwt_identity
 from flask_restful import Api, Resource
@@ -56,6 +56,41 @@ class UserResource(Resource):
         users = User.query.all()
         return {"users": [user.to_dict() for user in users]}, 200
 
+    def post(self):
+        data = request.get_json()
+
+        if not data or not all(k in data for k in ("name", "username", "email", "password")):
+            return {"error": "Missing data"}, 400
+
+        if User.query.filter_by(username=data['username']).first() or User.query.filter_by(email=data['email']).first():
+            return {"error": "User with that username or email already exists"}, 400
+
+        hashed_password = bcrypt.generate_password_hash(data['password']).decode('utf-8')
+
+        new_user = User(
+            name=data['name'],
+            username=data['username'],
+            email=data['email'],
+            password=hashed_password,  
+            role=data.get('role', 'user')
+        )
+        
+        db.session.add(new_user)
+        db.session.commit()
+
+        return new_user.to_dict(), 201
+
+    def delete(self, user_id):
+        user = User.query.get(user_id)
+        if not user:
+            return {"error": "User not found"}, 404
+        
+        db.session.delete(user)
+        db.session.commit()
+
+        return {"message": f"User with id {user_id} has been deleted"}, 200
+
+
 class RegisterResource(Resource):
     def post(self):
         name = request.json.get("name")
@@ -95,6 +130,12 @@ class LoginResource(Resource):
         token = create_access_token(identity={'username': user.username, 'role': user.role})
         return {"message": "Logged in successfully", "token": token, "role": user.role}, 200
 
+def parse_time(time_str):
+    try:
+        return datetime.strptime(time_str, '%H:%M:%S').time()
+    except ValueError:
+        raise ValueError("Invalid time format. Expected 'HH:MM:SS'")
+
 class EventResource(Resource):
     def get(self, event_id=None):
         if event_id:
@@ -118,14 +159,18 @@ class EventResource(Resource):
         if not name or not type_ or not date or not time or not location:
             return {"error": "Missing fields"}, 400
 
-        new_event = Event(
-            name=name, 
-            type=type_, 
-            date=datetime.strptime(date, '%Y-%m-%d').date(), 
-            time=parse_time(time), 
-            location=location, 
-            image_url=image_url
-        )
+        try:
+            new_event = Event(
+                name=name,
+                type=type_,
+                date=datetime.strptime(date, '%Y-%m-%d').date(),
+                time=parse_time(time),
+                location=location,
+                image_url=image_url
+            )
+        except ValueError as e:
+            return {"error": str(e)}, 400
+
         db.session.add(new_event)
         db.session.commit()
         return new_event.to_dict(), 201
@@ -156,7 +201,7 @@ class EventResource(Resource):
         return {"message": "Event deleted"}, 200
 
 class RSVPResource(Resource):
-    @jwt_required()
+   
     @jwt_required()
     def post(self):
         data = request.get_json()
@@ -284,8 +329,9 @@ class IncidentResource(Resource):
 
         db.session.commit()
         return incident.to_dict(), 200
-
-    def delete(self, incident_id):
+     
+    @app.route('/incidents/<int:incident_id>', methods=['DELETE'])
+    def delete_incident(incident_id):
         incident = Incident.query.get(incident_id)
         if not incident:
             return {"error": "Incident not found"}, 404
@@ -293,6 +339,47 @@ class IncidentResource(Resource):
         db.session.delete(incident)
         db.session.commit()
         return {"message": "Incident deleted"}, 200
+
+
+class NotificationResource(Resource):
+    def get(self, notification_id=None):
+        if notification_id:
+            notification = Notification.query.get(notification_id)
+            if notification:
+                return notification.to_dict(), 200
+            return {"error": "Notification not found"}, 404
+
+        notifications = Notification.query.all()
+        return {"notifications": [notification.to_dict() for notification in notifications]}, 200
+
+    def post(self):
+        data = request.json
+        title = data.get('title')
+        message = data.get('message')
+        date = data.get('date')  
+
+        if not title or not message or not date:
+            return {"error": "Missing fields"}, 400
+
+        new_notification = Notification(
+            title=title,
+            message=message,
+            date=datetime.strptime(date, '%Y-%m-%d').date()
+        )
+        db.session.add(new_notification)
+        db.session.commit()
+        return new_notification.to_dict(), 201
+
+    def delete(self, notification_id):
+        notification = Notification.query.get(notification_id)
+        if not notification:
+            return {"error": "Notification not found"}, 404
+
+        db.session.delete(notification)
+        db.session.commit()
+        return {"message": "Notification deleted successfully"}, 200
+
+api.add_resource(NotificationResource, '/notifications', '/notifications/<int:notification_id>')
 
 api.add_resource(IncidentResource, '/incidents', '/incidents/<int:id>')
 api.add_resource(Index, '/')

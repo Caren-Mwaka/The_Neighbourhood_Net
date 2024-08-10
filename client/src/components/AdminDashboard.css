@@ -1,26 +1,6 @@
-/* AdminDashboard.css */
-.container {
-    padding: 16px;
-  }
-  
-  .tabsContainer {
-    margin-bottom: 16px;
-  }
-  
-  .formContainer {
-    margin-bottom: 16px;
-  }
-  
-  .formItem {
-    margin-bottom: 16px;
-  }
-  
-  .listContainer {
-    height: 400px;
-    overflow-y: auto;
-  }
-  
-  .item {
-    margin-bottom: 16px;
-  }
-  
+
+
+button:hover {
+  background-color: #4fa79c !important;
+}
+
