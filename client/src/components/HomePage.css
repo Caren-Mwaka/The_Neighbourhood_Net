@@ -1,3 +1,4 @@
+
 @keyframes gentle-rotate {
   0% {
     transform: rotate(-3deg); 
@@ -27,28 +28,20 @@ html, body {
 }
 
 .frame {
-  width: 1200px;
-  height: 376px;
-  background: linear-gradient(to bottom, #4E958B, #192F2C);
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  padding: 20px;
-  box-sizing: border-box;
   position: relative; 
   top: -140px;
-  border-radius: 20px;
+
 }
 
 .cards-container {
   display: flex;
-  gap: 20px;
+  gap: 50px;
   position: relative;
 }
 
 .card {
-  width: 212px;
-  height: 376px;
+  width: 300px;
+  height: 400px;
   background: #ffffff;
   border-radius: 8px;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
@@ -61,18 +54,28 @@ html, body {
 }
 
 .card:nth-child(1) {
-  animation-delay: 0s;
-  animation-name: gentle-rotate, foreground-c1;
+  
+  animation-name: gentle-rotate;
 }
 
 .card:nth-child(2) {
-  animation-delay: 4s; 
-  animation-name: gentle-rotate, foreground-c2;
+  
+  animation-name: gentle-rotate;
 }
 
 .card:nth-child(3) {
-  animation-delay: 8s;
-  animation-name: gentle-rotate, foreground-c3;
+  
+  animation-name: gentle-rotate;
+}
+
+.card:nth-child(4) {
+  
+  animation-name: gentle-rotate;
+}
+
+.card:nth-child(5) {
+  
+  animation-name: gentle-rotate;
 }
 
 .card:hover {
