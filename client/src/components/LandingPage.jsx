@@ -8,6 +8,7 @@ import protectImage from '../assets/images/protect.jpeg';
 import engageImage from '../assets/images/engage.jpeg'; 
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faAddressBook } from '@fortawesome/free-solid-svg-icons';
+import ContactSection from './ContactSection';
 
 const LandingPage = () => {
   return (
@@ -49,6 +50,9 @@ const LandingPage = () => {
             <div className="image-caption">ENGAGE</div>
           </div>
         </div>
+      </div>
+      <div className="section contact-section">
+        <ContactSection />
       </div>
     </>
   );

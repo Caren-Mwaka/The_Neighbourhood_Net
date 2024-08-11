@@ -30,6 +30,15 @@ body, html {
     width: 100%;
 }
 
+.contact-section {
+    background: linear-gradient(to bottom, #4e958b, #192F2C);
+    color: white;
+    text-align: center;
+    padding-top: 70px; 
+    width: 100%;
+    overflow: hidden;
+}
+
 .app-bar {
     width: 100%;
     display: flex;
