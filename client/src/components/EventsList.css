@@ -3,6 +3,8 @@
   justify-content: space-between;
   align-items: flex-start;
   padding: 20px;
+  max-width: 100%; /* Increase this value to make the container wider */
+  margin: 0 auto;
 }
 
 .header {
