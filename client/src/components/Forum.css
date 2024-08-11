@@ -1,0 +1,134 @@
+.forum {
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+  }
+  
+  .navbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: linear-gradient(to bottom, #4e958b, #192F2C);
+    padding: 1px;
+    color: white;
+  }
+  
+  .navbar-logo {
+    height: 150px;
+  }
+  
+  .navbar-title {
+    font-size: 2.5em;
+    flex: 1;
+    text-align: center;
+  }
+  
+  .search-bar {
+    padding: 10px;
+    border-radius: 5px;
+    border: none;
+  }
+  
+  .main-content {
+    display: flex;
+    height: 100%;
+  }
+  
+  .sidebar {
+    width: 25%;
+    background-color: #244646;
+    padding: 20px;
+    color: white;
+  }
+  
+  .sidebar h2 {
+    margin-top: 0;
+  }
+  
+  .sidebar ul {
+    list-style: none;
+    padding: 0;
+  }
+  
+  .sidebar li {
+    display: flex;
+    align-items: center;
+    margin: 15px 0;
+    cursor: pointer;
+  }
+  
+  .sidebar li.selected {
+    background-color: #4e958b;
+    padding: 5px;
+    border-radius: 5px;
+  }
+  
+  .user-image {
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    margin-right: 10px;
+  }
+  
+  .notifications {
+    display: block;
+    width: 100%;
+    padding: 10px;
+    margin-top: 20px;
+    background: linear-gradient(to bottom, #4e958b, #192F2C);
+    border: none;
+    color: white;
+    cursor: pointer;
+  }
+  
+  .chat-window {
+    width: 75%;
+    display: flex;
+    flex-direction: column;
+    background-color: #f5f5f5;
+  }
+  
+  .chat-header {
+    padding: 10px;
+    background: linear-gradient(to bottom, #4e958b, #192F2C);
+    color: white;
+    text-align: center;
+  }
+  
+  .chat-window .messages {
+    flex: 1;
+    padding: 20px;
+    overflow-y: scroll;
+  }
+  
+  .chat-window .message {
+    display: flex;
+    align-items: center;
+    margin: 10px 0;
+    background-color: #fff;
+    padding: 10px;
+    border-radius: 10px;
+  }
+  
+  .chat-window .message-input {
+    display: flex;
+    padding: 10px;
+    background: linear-gradient(to bottom, #4e958b, #192F2C);
+  }
+  
+  .chat-window .message-input input {
+    flex: 1;
+    padding: 10px;
+    border: none;
+    border-radius: 5px;
+  }
+  
+  .chat-window .message-input button {
+    padding: 10px;
+    background: linear-gradient(to bottom, #4e958b, #192F2C);
+    border: none;
+    border-radius: 5px;
+    color: white;
+    cursor: pointer;
+    margin-left: 10px;
+  }
