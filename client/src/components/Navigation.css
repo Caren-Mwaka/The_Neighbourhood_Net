@@ -1,42 +1,55 @@
 .navbar {
-    background-color: #4E958B;
-    padding: 10px;
-  }
-   .nav-links {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    list-style: none;
-    margin: 0;
-    padding: 0;
-  }
-   .nav-links li {
-    margin: 0 30px;
-  }
-   .nav-links a {
-    color: #ffffff;
-    text-decoration: none;
-    font-weight: bold;
-    font-family: 'Piazzolla', serif;
-  }
-   .center {
-    color: #34E8DC;
-    font-family: 'Playball', cursive;
-    font-size: 1.5rem;
-    text-align: center;
-    flex-grow: 1;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-  }
-   .logout-button {
-    background-color: #192F2C;
-    color: #ffffff;
-    border: none;
-    border-radius: 10px;
-    padding: 5px 10px;
-    cursor: pointer;
-    font-family: 'Piazzolla', serif;
-    font-size: 1rem;
-  }
- 
+  background-color: #4E958B;
+  padding: 10px;
+}
+
+.nav-links {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.nav-links li {
+  margin: 0 30px;
+}
+
+.nav-links a {
+  color: #ffffff;
+  text-decoration: none;
+  font-weight: bold;
+  font-family: 'Piazzolla', serif;
+}
+
+.notification-count {
+  background-color: #ff0000;
+  color: #ffffff;
+  border-radius: 12px;
+  padding: 0.2rem 0.5rem;
+  font-size: 0.75rem;
+  margin-left: 0.5rem;
+}
+
+.center {
+  color: #34E8DC;
+  font-family: 'Playball', cursive;
+  font-size: 1.5rem;
+  text-align: center;
+  flex-grow: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.logout-button {
+  background-color: #192F2C;
+  color: #ffffff;
+  border: none;
+  border-radius: 10px;
+  padding: 5px 10px;
+  cursor: pointer;
+  font-family: 'Piazzolla', serif;
+  font-size: 1rem;
+}

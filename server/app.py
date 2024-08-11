@@ -349,14 +349,15 @@ class NotificationResource(Resource):
                 return notification.to_dict(), 200
             return {"error": "Notification not found"}, 404
 
-        notifications = Notification.query.all()
+        notifications = Notification.query.filter_by(dismissed=False).all()
+        print(f"Remaining Notifications: {[notification.to_dict() for notification in notifications]}")
         return {"notifications": [notification.to_dict() for notification in notifications]}, 200
-
+    
     def post(self):
         data = request.json
         title = data.get('title')
         message = data.get('message')
-        date = data.get('date')  
+        date = data.get('date')
 
         if not title or not message or not date:
             return {"error": "Missing fields"}, 400
@@ -375,9 +376,9 @@ class NotificationResource(Resource):
         if not notification:
             return {"error": "Notification not found"}, 404
 
-        db.session.delete(notification)
+        notification.dismissed = True
         db.session.commit()
-        return {"message": "Notification deleted successfully"}, 200
+        return {"message": "Notification dismissed successfully"}, 200
 
 api.add_resource(NotificationResource, '/notifications', '/notifications/<int:notification_id>')
 

@@ -1,5 +1,5 @@
 from app import app, db, bcrypt
-from models import User, Event, RSVP, Incident
+from models import User, Event, RSVP, Incident, Notification
 from datetime import datetime, time
 
 
@@ -36,6 +36,14 @@ rsvps = [
 incidents = [
     {'name': 'Broken Streetlight', 'date': '2024-08-01', 'type': 'Infrastructure Issues', 'priority': 'high', 'location': 'Main St', 'description': 'The streetlight at Main St and 1st Ave is not working.'},
     {'name': 'Loud Noise Complaint', 'date': '2024-08-05', 'type': 'Safety Concerns', 'priority': 'medium', 'location': '2nd Ave', 'description': 'Loud music coming from a house on 2nd Ave.'},
+]
+
+notifications = [
+    {'title': 'Scheduled Maintenance', 'message': 'The server will be down for maintenance on August 20th from 2:00 AM to 4:00 AM.', 'date': '2024-08-18'},
+    {'title': 'New Event Added', 'message': 'A new event, "Tech Innovators Expo", has been added to the calendar.', 'date': '2024-08-10'},
+    {'title': 'Incident Reported', 'message': 'An incident has been reported: Broken Streetlight on Main St.', 'date': '2024-08-01'},
+    {'title': 'Welcome!', 'message': 'Welcome to the Neighbourhood Network! Stay tuned for more updates.', 'date': '2024-08-01'},
+    {'title': 'Weekly Roundup', 'message': 'Here’s what happened in your neighborhood this week.', 'date': '2024-08-11'},
 ]
 
 
@@ -80,6 +88,13 @@ with app.app_context():
             priority=incident_data['priority'],
             location=incident_data['location'],
             description=incident_data['description']
+        ))
+
+    for notification_data in notifications:
+        db.session.add(Notification(
+            title=notification_data['title'],
+            message=notification_data['message'],
+            date=datetime.strptime(notification_data['date'], '%Y-%m-%d').date()
         ))
 
     db.session.commit()

@@ -127,14 +127,15 @@ class Incident(db.Model):
 class Notification(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     title = db.Column(db.String(100), nullable=False)
-    message = db.Column(db.String(500), nullable=False)
-    date = db.Column(db.Date, nullable=False, default=datetime.utcnow)
-   
+    message = db.Column(db.String(250), nullable=False)
+    date = db.Column(db.Date, nullable=False)
+    dismissed = db.Column(db.Boolean, default=False)  # New field
 
     def to_dict(self):
         return {
-            'id': self.id,
-            'title': self.title,
-            'message': self.message, 
-            'date': self.date.isoformat()
+            "id": self.id,
+            "title": self.title,
+            "message": self.message,
+            "date": self.date.isoformat(),
+            "dismissed": self.dismissed
         }
