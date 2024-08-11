@@ -16,7 +16,7 @@ const Navigation = ({ notificationCount = 0 }) => (
     </div>
     <ul className="nav-links">
       <li>
-        <Link to="/home">Home</Link> {/* Added Home link */}
+        <Link to="/home">Home</Link> 
       </li>
       <li>
         <Link to="/profile">Profile</Link>

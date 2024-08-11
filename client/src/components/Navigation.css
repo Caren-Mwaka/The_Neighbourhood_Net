@@ -13,7 +13,7 @@ html, body {
 
 .navbar {
   width: 100%;
-  background-color: #4e958b;
+  background-color: #4e958b !important;
   padding: 10px;
   display: flex;
   justify-content: space-between;
@@ -22,12 +22,13 @@ html, body {
 
 .homelogo-container {
   position: relative;
-  margin-right: 0; /* Adjust if necessary */
+  margin-right: 0; 
   background: linear-gradient(to bottom, #4e958b, #192f2c);
   padding: 5px;
   border-radius: 10px;
   margin-top: 5px;
   overflow: hidden;
+  margin-left: 10px;
 }
 
 .homelogo-container::before {
@@ -67,7 +68,7 @@ html, body {
 }
 
 .nav-links li {
-  margin: 0 20px; /* Adjust spacing to prevent overflow */
+  margin: 0 20px; 
 }
 
 .nav-links a {
