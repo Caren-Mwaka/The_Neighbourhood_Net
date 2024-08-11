@@ -1,0 +1,154 @@
+body, html {
+    height: 100%;
+    margin: 0;
+    font-family: Arial, sans-serif;
+}
+
+.section {
+    overflow: auto;
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    position: relative; 
+    width: 100%;
+    
+}
+
+.landing-section {
+    background-size: cover;
+    background-position: center;
+    width: 100%;
+}
+
+.welcome-section {
+    background: linear-gradient(to bottom, #4e958b, #192F2C);
+    color: white;
+    text-align: center;
+    padding-top: 70px; 
+    width: 100%;
+}
+
+.contact-section {
+    background: linear-gradient(to bottom, #4e958b, #192F2C);
+    color: white;
+    text-align: center;
+    padding-top: 70px; 
+    width: 100%;
+    overflow: hidden;
+}
+
+.app-bar {
+    width: 100%;
+    display: flex;
+    max-width: 1729px;
+    justify-content: space-between;
+    align-items: center;
+    padding: 20px;
+    background-color: rgba(78, 80, 79, 0.5); 
+    position: absolute;
+    top: 0;
+    z-index: 10;
+    /* margin-right: 20px;
+    margin-left: 10px; */
+    
+}
+
+.app-bar-links {
+    display: flex;
+    gap: 40px;
+    margin-left: 10px;
+    
+}
+
+.right-links {
+    display: flex;
+    gap: 40px;
+}
+
+.right-links a, .app-bar-links a {
+    color: white;
+    text-decoration: none;
+    display: flex;
+    align-items: center;
+}
+
+.right-links a {
+    color: white;
+    text-decoration: none;
+    display: flex;
+    align-items: center;
+    cursor: pointer; 
+}
+
+.right-links a:hover {
+    color: #f0f0f0; 
+}
+
+
+.contact-link {
+    display: flex;
+    align-items: center;
+}
+
+.contact-link span {
+    margin-left: 10px; 
+}
+
+.images-container {
+    display: flex;
+    justify-content: center;
+    align-items: flex-end;
+    gap: 100px;
+    margin-top: 70px;
+}
+
+.image-card {
+    overflow: hidden;
+    border-radius: 30px;
+    width: 250px; 
+    height: 750px; 
+    position: relative;
+}
+
+.image-card img {
+    width: 100%;
+    height: auto; 
+}
+
+.image-caption {
+    padding: 10px;
+    font-size: 2em;
+    color: black;
+    text-align: center;
+}
+
+.image-card.share {
+    margin-bottom: 20px; 
+}
+
+.image-card.protect {
+    margin-bottom: 100px; 
+}
+
+.image-card.engage {
+    margin-bottom: 20px; 
+}
+.logo-container {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    text-align: center;
+}
+
+.logo-background {
+    background-color: rgba(78, 149, 139, 0.7); 
+    padding: 20px;
+    border-radius: 20px;
+}
+.logo-image {
+    width: 270px; 
+    height: auto;
+}

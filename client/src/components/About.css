@@ -1,0 +1,91 @@
+
+.container {
+    display: flex;
+    flex-direction: row;
+    width: 100vw !important;
+    min-height: 100vh;
+    background-color: #45847b;
+    background: linear-gradient(to bottom, #45847b, #192F2C);
+    margin: 0 !important;
+    padding: 0 !important;
+    overflow: hidden;
+}
+
+.content {
+    flex: 1;
+    padding: 40px;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    overflow-y: auto; 
+}
+
+.description {
+    color: #ffffff;
+    font-size: 1.2em;
+    margin-bottom: 20px; 
+    font-family: 'Outfit', sans-serif;
+    text-align: left;
+}
+
+.social-icons {
+    margin-top: 20px;
+    display: flex;
+    flex-direction: column; 
+    gap: 10px;
+}
+
+.social-link {
+    color: white;
+    text-decoration: none;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    font-family: 'Outfit', sans-serif;
+}
+
+.image-container {
+    position: relative;
+    width: 50%; 
+    max-width: 600px; 
+    height: 90vh; 
+    margin: 20px;
+    margin-top: 40px;
+    flex-shrink: 0; 
+    border-radius: 20px;
+    overflow: hidden; 
+}
+
+.neighborhood-image {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.aboutlogo {
+    width: 200px; 
+    height: auto; 
+    margin-bottom: 10px; 
+    display: block; 
+    margin-left: 0;
+    padding: 10px; 
+    background: linear-gradient(135deg, #45847b, #192F2C); 
+    border-radius: 15px; 
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+    display: flex; 
+    justify-content: center; 
+    align-items: left; 
+}
+
+ul {
+    margin: 0;
+    padding-left: 0; 
+    list-style-type: disc; 
+    text-align: left;
+}
+
+li {
+    margin-bottom: 20px; 
+    margin-top: 10px;
+    color: #ffffff; 
+}
