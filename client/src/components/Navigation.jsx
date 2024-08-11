@@ -1,10 +1,10 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import './Navigation.css'; 
+import './Navigation.css';
 
 import LogoutButton from './LogoutButton';
 
-const Navigation = () => (
+const Navigation = ({ notificationCount = 0 }) => (
   <nav className="navbar">
     <ul className="nav-links">
       <li><Link to="/profile">Profile</Link></li>
@@ -16,7 +16,14 @@ const Navigation = () => (
         <span>Net</span>
       </li>
       <li><Link to="/community-forum">Community Forum</Link></li>
-      <li><Link to="/notifications">Notifications</Link></li>
+      <li>
+        <Link to="/notifications">
+          Notifications
+          {notificationCount > 0 && (
+            <span className="notification-count">{notificationCount}</span>
+          )}
+        </Link>
+      </li>
       <li><Link to="/about">About</Link></li>
       <li><LogoutButton /></li>
     </ul>

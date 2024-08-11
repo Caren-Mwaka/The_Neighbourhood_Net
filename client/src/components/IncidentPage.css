@@ -1,177 +1,184 @@
-
-html, body {
-    height: 100%;
-    width: 100%;
-    margin: 0;
-    padding: 0;
-    font-family: 'Arial', sans-serif;
-    background: linear-gradient(to bottom, #4e958b, #192f2c); 
-    overflow: hidden;
+html,
+body {
+  height: 100%;
+  width: 100%;
+  margin: 0;
+  padding: 0;
+  font-family: "Arial", sans-serif;
+  background: linear-gradient(to bottom, #4e958b, #192f2c);
 }
 
 #root {
-    height: 100%;
+  height: 100%;
 }
 
 .report-section {
-    display: flex;
-    flex-direction: row;
-    justify-content: center;
-    align-items: center; 
-    min-height: auto; 
-    padding: 20px;
-    box-sizing: border-box;
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
+
+  min-height: auto;
+
+  padding: 20px;
+  box-sizing: border-box;
+  overflow: hidden;
 }
 
 .report-container {
-    display: flex; 
-    background-color: rgba(0, 0, 0, 0.6);
-    border-radius: 10px;
-    overflow: hidden;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-    max-width: 55%;
-    width: 55%;
-    margin: 20px;
-    box-sizing: border-box;
+  display: flex;
+  background-color: rgba(0, 0, 0, 0.6);
+  border-radius: 10px;
+  overflow: hidden;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  max-width: 55%;
+  width: 55%;
+  margin: 20px;
+  box-sizing: border-box;
+  flex: 1;
 }
-
+.report-container,
+.incident-list-container {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
 .report-image {
-    width: 50%; 
-    height: auto;
-    background-size: cover;
-    background-position: center;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-    padding: 20px;
+  width: 50%;
+  height: auto;
+  background-size: cover;
+  background-position: center;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  padding: 20px;
 }
 
 .report-form {
-    width: 50%; 
-    padding: 20px;
-    box-sizing: border-box;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
+  width: 50%;
+  padding: 20px;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
 }
 
 .report-title {
-    color: #fff;
-    margin-bottom: 10px;
-    text-align: center;
-    font-size: 2rem;
+  color: #fff;
+  margin-bottom: 10px;
+  text-align: center;
+  font-size: 2rem;
 }
 
 .report-subtitle {
-    color: #fff;
-    text-align: center;
+  color: #fff;
+  text-align: center;
 }
 
 .form-title {
-    color: #fff;
-    margin-bottom: 20px;
-    text-align: center;
+  color: #fff;
+  margin-bottom: 20px;
+  text-align: center;
 }
 
 .btn {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    width: 100%;
-    padding: 15px;
-    border: none;
-    border-radius: 5px;
-    background-color: #192F2C !important;  
-    color: #004d40;
-    font-size: 1rem;
-    cursor: pointer;
-    transition: background-color 0.3s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  padding: 15px;
+  border: none;
+  border-radius: 5px;
+  background-color: #192f2c !important;
+  color: #004d40;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
 }
 
 .btn:hover {
-    background-color: #4e958b !important;  
+  background-color: #4e958b !important;
 }
 
 .incident-list-container {
-    width: 40%;
-    margin: 20px;
-    max-width: 40%;
-    background-color: transparent;
-    border-radius: 10px;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-    padding: 10px;
-    max-height: 80vh; 
-    overflow-y: auto; 
+  width: 40%;
+  margin: 20px;
+  max-width: 40%;
+  background-color: transparent;
+  border-radius: 10px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  padding: 10px;
+  max-height: 80vh;
+  overflow-y: auto;
+  position: relative;
 }
 
-
 .incident-card {
-    background-color: #192F2C;
-    color: #faf7f7;
-    border-radius: 5px;
-    padding: 10px;
-    margin-top: 10px;
-    box-sizing: border-box;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    text-align: center;
-    word-wrap: break-word; 
-    overflow-wrap: break-word; 
-    word-break: break-word; 
+  background-color: #192f2c;
+  color: #faf7f7;
+  border-radius: 5px;
+  padding: 10px;
+  margin-top: 10px;
+  box-sizing: border-box;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  word-wrap: break-word;
+  overflow-wrap: break-word;
+  word-break: break-word;
 }
 
 .incident-card p {
-    margin: 5px 0;
-    color: #fdfcfc;
-    font-weight: bold;
-    word-wrap: break-word; 
-    overflow-wrap: break-word; 
-    word-break: break-word; 
+  margin: 5px 0;
+  color: #fdfcfc;
+  font-weight: bold;
+  word-wrap: break-word;
+  overflow-wrap: break-word;
+  word-break: break-word;
 }
 
 .incident-card h6 {
-    margin: 0;
-    padding-bottom: 10px; 
-    font-weight: bold;
+  margin: 0;
+  padding-bottom: 10px;
+  font-weight: bold;
 }
 
 .incident-card p strong {
-    color: #faf7f7;
-    display: block;
-    font-weight: bold;
+  color: #faf7f7;
+  display: block;
+  font-weight: bold;
 }
 
 /* Pagination styling */
 .pagination-container {
-    display: flex;
-    justify-content: space-between;
-    margin-top: 20px;
-    background-color: transparent; 
-    padding: 10px;
-    border-radius: 5px;
-    width: 100%; 
-    box-sizing: border-box;
+  display: flex;
+  justify-content: space-between;
+  margin-top: 20px;
+  background-color: transparent;
+  padding: 10px;
+  border-radius: 5px;
+  width: 100%;
+  box-sizing: border-box;
 }
 
 .pagination-container button {
-    color: #fff; 
-    background-color: rgba(0, 0, 0, 0.6); 
-    border: none;
-    padding: 10px 20px;
-    border-radius: 5px;
-    cursor: pointer;
-    transition: background-color 0.3s ease;
-   
+  color: #fff;
+  background-color: rgba(0, 0, 0, 0.6);
+  border: none;
+  padding: 10px 20px;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
 }
 
 .pagination-container button:hover {
-    background-color: #4e958b; 
+  background-color: #4e958b;
 }
 
 .pagination-container button:disabled {
-    background-color: rgba(0, 0, 0, 0.3); 
-    cursor: not-allowed;
+  background-color: rgba(0, 0, 0, 0.3);
+  cursor: not-allowed;
 }

@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import dashlogo from "../assets/neighbourhood-net-logo.png";
+import { useNavigate } from "react-router-dom";
 
 import {
   Button,
@@ -24,6 +25,7 @@ const AdminDashboard = () => {
   const [incidents, setIncidents] = useState([]);
   const [events, setEvents] = useState([]);
   const [notifications, setNotifications] = useState([]);
+  const navigate = useNavigate();
 
   const [newUser, setNewUser] = useState({
     name: "",
@@ -213,7 +215,10 @@ const AdminDashboard = () => {
         toast.success("Notification added successfully!");
         setNewNotification({ title: "", message: "", date: "" });
       } else {
-        toast.error("Failed to add notification.");
+        const errorData = await response.json();
+        toast.error(
+          `Failed to add notification: ${errorData.error || "Unknown error"}`
+        );
       }
     } catch (error) {
       console.error("Error adding notification:", error);
@@ -346,27 +351,48 @@ const AdminDashboard = () => {
       <Box
         sx={{
           display: "flex",
+          justifyContent: "space-between",
           alignItems: "center",
           mb: 4,
+
+          marginTop: -4,
         }}
       >
-        <img
-          src={dashlogo}
-          alt="Logo"
-          style={{
-            width: "150px",
-            height: "auto",
-            maxWidth: "100%",
-          }}
-        />
-        <Typography
-          variant="h6" 
+        <Box
           sx={{
-            marginLeft: 2, 
+            display: "flex",
+            alignItems: "center",
           }}
         >
-          Neighbourhood Admin
-        </Typography>
+          <img
+            src={dashlogo}
+            alt="Logo"
+            style={{
+              width: "150px",
+              height: "auto",
+              maxWidth: "100%",
+            }}
+          />
+          <Typography
+            variant="h6"
+            sx={{
+              marginLeft: 2,
+            }}
+          >
+            Neighbourhood Admin
+          </Typography>
+        </Box>
+
+        <Button
+          variant="contained"
+          sx={{
+            backgroundColor: "#39a599",
+            color: "#ffffff",
+          }}
+          onClick={() => navigate("/")}
+        >
+          Go Back
+        </Button>
       </Box>
 
       <Box paddingBottom={5}>
@@ -536,7 +562,7 @@ const AdminDashboard = () => {
               boxShadow: 1,
               width: "45%",
               maxWidth: 800,
-              marginBottom: 10,
+              marginBottom: 20,
             }}
           >
             <Typography sx={{ color: "white" }}>Add Incident</Typography>
@@ -889,7 +915,7 @@ const AdminDashboard = () => {
             />
             <Button
               variant="contained"
-              onClick={handleAddUser}
+              onClick={handleAddNotification}
               sx={{
                 mt: 2,
                 backgroundColor: "#39a599",
