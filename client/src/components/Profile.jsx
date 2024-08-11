@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import styles from "./Profile.module.css"; // Updated import to use CSS Modules
+import styles from "./Profile.module.css";
 import { Visibility, VisibilityOff } from "@mui/icons-material";
 
 const Profile = () => {
@@ -44,14 +44,33 @@ const Profile = () => {
     }
   };
 
-  const handleImageUpload = (e) => {
+  const handleImageUpload = async (e) => {
     const file = e.target.files[0];
     if (file) {
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        setAvatar(reader.result);
-      };
-      reader.readAsDataURL(file);
+      const formData = new FormData();
+      formData.append("file", file);
+      formData.append("upload_preset", "zjphv40j"); // Replace with your actual preset
+
+      try {
+        const response = await fetch(
+          "https://api.cloudinary.com/v1_1/djlpav9jq/image/upload", // Cloudinary cloud name
+          {
+            method: "POST",
+            body: formData,
+          }
+        );
+
+        if (!response.ok) {
+          throw new Error("Failed to upload image");
+        }
+
+        const data = await response.json();
+        setAvatar(data.secure_url); // Store the uploaded image URL
+
+        // Optional: Save the avatar URL to the backend
+      } catch (error) {
+        console.error("Error uploading image:", error);
+      }
     }
   };
 
@@ -86,11 +105,11 @@ const Profile = () => {
       <div className={styles.contentWrapper}>
         <div className={styles.sidebarColumn}>
           <aside className={styles.sidebar}>
-            <h2 className={styles.sidebarTitle}>UserProfile</h2>
+            <h2 className={styles.sidebarTitle}>User Profile</h2>
             <img
               src={
                 avatar ||
-                "https://cdn.builder.io/api/v1/image/assets/TEMP/abbf950f2a8a007869429c7e9fd0e822f1523d6d3ea027e64766fd65baab6430?placeholderIfAbsent=true&apiKey=d975cdd6201143ddb3c9da5092c113ba"
+                "https://res.cloudinary.com/djlpav9jq/image/upload/images_2_hvixf8" // Default avatar image
               }
               className={styles.profileImage}
               alt="User profile"
@@ -114,9 +133,9 @@ const Profile = () => {
           <form className={styles.mainContent} onSubmit={handleSubmit}>
             <div className={styles.headerWrapper}>
               <img
-                src="https://cdn.builder.io/api/v1/image/assets/TEMP/3ca809c633e39eabf604c499dde220cebfbfd013719a5287b08a4218f250461d?placeholderIfAbsent=true&apiKey=d975cdd6201143ddb3c9da5092c113ba"
+                src="https://cdn.builder.io/api/v1/image/assets/TEMP/3ca809c633e39eabf604c499dde220cebfbfd013719a5287b08a4218f250461d?placeholderIfAbsent=true&apiKey=d975cdd6201143ddb3c9da5092c113ba" // Replace with your website logo URL
                 className={styles.headerImage}
-                alt="User avatar"
+                alt="Website Logo"
               />
             </div>
             <label htmlFor="username" className={styles.formLabel}>
@@ -171,7 +190,7 @@ const Profile = () => {
                 type={showPassword ? "text" : "password"}
                 id="password"
                 name="password"
-                className={styles.formInput} // Use styles.formInput for consistency
+                className={styles.formInput}
                 value={formData.password}
                 onChange={handleInputChange}
               />
