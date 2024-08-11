@@ -7,6 +7,7 @@ import RegisterPage from "./RegisterPage";
 import Navigation from "./Navigation";
 import IncidentPage from "./IncidentPage";
 import Forum from "./Forum"
+import Profile from "./Profile";
 import "./App.css";
 import About from "./About";
 import EventsList from "./EventsList";
@@ -47,6 +48,14 @@ const router = createBrowserRouter([
   {
     path: "/community-forum",
     element: <Forum />,
+  },
+  {
+    path: "/profile",
+    element: (
+      <MainLayout>
+        <Profile />
+      </MainLayout>
+    ),
   },
   {
     path: "/events",
