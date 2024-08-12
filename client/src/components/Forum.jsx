@@ -118,23 +118,19 @@ const Forum = () => {
 
   const handleThreadDelete = async (threadId) => {
     try {
-      const response = await fetch(
-        `http://localhost:5555/threads/${threadId}`,
-        {
-          method: "DELETE",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${localStorage.getItem("token")}`,
-          },
-          body: JSON.stringify({ id: threadId }), // Include the ID in the request body
-        }
-      );
-
+      const response = await fetch(`http://localhost:5555/threads/${threadId}`, {
+        method: "DELETE",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${localStorage.getItem("token")}`,
+        },
+      });
+  
       if (!response.ok) {
         const errorData = await response.json();
         throw new Error(errorData.error || "Failed to delete thread");
       }
-
+  
       setThreads(threads.filter((thread) => thread.id !== threadId));
       setSelectedThread(null);
       setMessages([]);
@@ -143,32 +139,32 @@ const Forum = () => {
       console.error("Error:", error);
     }
   };
+  
 
   const handleMessageDelete = async (messageId) => {
     try {
-      const response = await fetch(
-        `http://localhost:5555/messages/${messageId}`,
-        {
-          method: "DELETE",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${localStorage.getItem("token")}`,
-          },
-          body: JSON.stringify({ id: messageId }), // Include the ID in the request body
-        }
-      );
-
+      // Make sure `selectedThreadId` is correctly set
+      const response = await fetch(`http://localhost:5555/threads/${selectedThreadId}/messages/${messageId}`, {
+        method: "DELETE",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${localStorage.getItem("token")}`,
+        },
+      });
+  
       if (!response.ok) {
         const errorData = await response.json();
         throw new Error(errorData.error || "Failed to delete message");
       }
-
+  
       setMessages(messages.filter((message) => message.id !== messageId));
       setContextMenuVisible(false);
     } catch (error) {
       console.error("Error:", error);
     }
   };
+  
+  
 
   const handleCreateThread = async () => {
     if (newThreadTitle.trim()) {

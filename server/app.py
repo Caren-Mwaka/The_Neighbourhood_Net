@@ -466,7 +466,7 @@ class MessageListResource(Resource):
             'created_at': message.created_at
         })
 
-    def delete(self, thread_id):
+    def delete(self, thread_id, message_id):
         data = request.json
         message_id = data.get('id')
 
@@ -481,7 +481,7 @@ class MessageListResource(Resource):
         db.session.delete(message)
         db.session.commit()
         return {'message': 'Message deleted successfully'}
-
+    
 api.add_resource(ThreadListResource, '/threads')
 api.add_resource(MessageListResource, '/threads/<int:thread_id>/messages')
     
