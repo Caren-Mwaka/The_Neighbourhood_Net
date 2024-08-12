@@ -11,6 +11,7 @@ import Profile from "./Profile";
 import "./App.css";
 import About from "./About";
 import EventsList from "./EventsList";
+import ContactSection from "./ContactSection"; // Import the ContactSection component
 import NotificationList from "./NotificationList";
 import AdminDashboard from './AdminDashboard'
 import { ToastContainer, toast } from 'react-toastify';
@@ -88,6 +89,10 @@ const router = createBrowserRouter([
         <NotificationList/>
       </MainLayout>
     ),
+  },
+  {
+    path: "/contact", // Add the route for the contact section
+    element: <ContactSection />, 
   },
 ]);
 
