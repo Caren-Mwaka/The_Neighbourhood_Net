@@ -19,9 +19,13 @@ app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 db.init_app(app)
 bcrypt = Bcrypt(app)
 migrate = Migrate(app, db)
-CORS(app, resources={r"/*": {"origins": "*"}})
+
+# Initialize CORS with proper settings
+CORS(app, resources={r"/*": {"origins": "http://localhost:5173", "supports_credentials": True}})
+
 jwt = JWTManager(app)
 api = Api(app)
+
 
 def generate_token(user):
     return create_access_token(identity=user.username)
@@ -29,7 +33,11 @@ def generate_token(user):
 @app.route('/logout', methods=['POST'])
 def logout():
     session.clear()
-    return jsonify({"message": "Logged out successfully"}), 200
+    response = jsonify({"message": "Logged out successfully"})
+    response.headers.add('Access-Control-Allow-Origin', 'http://localhost:5173')
+    response.headers.add('Access-Control-Allow-Credentials', 'true')
+    return response
+
 
 @app.route('/protected', methods=['GET'])
 @jwt_required()
@@ -44,7 +52,7 @@ def handle_not_found(e):
 class Index(Resource):
     def get(self):
         return {"index": "Welcome to the Neighbourhood Net"}
-    
+
 @app.route('/user-info', methods=['GET'])
 @jwt_required()
 def get_user_info():
@@ -121,19 +129,19 @@ class RegisterResource(Resource):
         return new_user.to_dict(), 201
 
 class LoginResource(Resource):
-   def post(self):
-    email = request.json.get("email")
-    password = request.json.get("password")
+    def post(self):
+        email = request.json.get("email")
+        password = request.json.get("password")
 
-    user = User.query.filter_by(email=email).first()
-    if not user:
-        return {"error": "Invalid credentials"}, 401
+        user = User.query.filter_by(email=email).first()
+        if not user:
+            return {"error": "Invalid credentials"}, 401
 
-    if not bcrypt.check_password_hash(user.password, password):
-        return {"error": "Invalid credentials"}, 401
+        if not bcrypt.check_password_hash(user.password, password):
+            return {"error": "Invalid credentials"}, 401
 
-    token = create_access_token(identity={'username': user.username, 'role': user.role})
-    return {"message": "Logged in successfully", "token": token, "role": user.role, "user_id": user.id}, 200
+        token = create_access_token(identity={'username': user.username, 'role': user.role})
+        return {"message": "Logged in successfully", "token": token, "role": user.role, "user_id": user.id}, 200
 
 
 def parse_time(time_str):
@@ -263,17 +271,20 @@ class RSVPResource(Resource):
             return {'error': 'User not found'}, 404
 
         rsvp = RSVP.query.get(rsvp_id)
-        if not rsvp or rsvp.user_id != user.id:
-            return {'error': 'RSVP not found or access denied'}, 404
-
-        data = request.get_json()
-        event_id = data.get('eventId')
+        if not rsvp:
+            return {"error": "RSVP not found"}, 404
+        
+        if rsvp.user_id != user.id:
+            return {"error": "Unauthorized"}, 403
+        
+        data = request.json
+        event_id = data.get('event_id')
         
         if event_id:
             rsvp.event_id = event_id
         
         db.session.commit()
-        return {'message': 'RSVP updated successfully'}, 200
+        return {"message": "RSVP updated"}, 200
 
     @jwt_required()
     def delete(self, rsvp_id):
@@ -285,12 +296,15 @@ class RSVPResource(Resource):
             return {'error': 'User not found'}, 404
 
         rsvp = RSVP.query.get(rsvp_id)
-        if not rsvp or rsvp.user_id != user.id:
-            return {'error': 'RSVP not found or access denied'}, 404
-
+        if not rsvp:
+            return {"error": "RSVP not found"}, 404
+        
+        if rsvp.user_id != user.id:
+            return {"error": "Unauthorized"}, 403
+        
         db.session.delete(rsvp)
         db.session.commit()
-        return {'message': 'RSVP deleted successfully'}, 200
+        return {"message": "RSVP deleted"}, 200
 
 class IncidentResource(Resource):
     def get(self, incident_id=None):
@@ -355,24 +369,18 @@ class NotificationResource(Resource):
                 return notification.to_dict(), 200
             return {"error": "Notification not found"}, 404
 
-        notifications = Notification.query.filter_by(dismissed=False).all()
-        print(f"Remaining Notifications: {[notification.to_dict() for notification in notifications]}")
+        notifications = Notification.query.all()
         return {"notifications": [notification.to_dict() for notification in notifications]}, 200
-    
+
     def post(self):
         data = request.json
-        title = data.get('title')
         message = data.get('message')
-        date = data.get('date')
+        user_id = data.get('user_id')
 
-        if not title or not message or not date:
+        if not message or not user_id:
             return {"error": "Missing fields"}, 400
 
-        new_notification = Notification(
-            title=title,
-            message=message,
-            date=datetime.strptime(date, '%Y-%m-%d').date()
-        )
+        new_notification = Notification(message=message, user_id=user_id)
         db.session.add(new_notification)
         db.session.commit()
         return new_notification.to_dict(), 201
@@ -382,10 +390,11 @@ class NotificationResource(Resource):
         if not notification:
             return {"error": "Notification not found"}, 404
 
-        notification.dismissed = True
+        db.session.delete(notification)
         db.session.commit()
-        return {"message": "Notification dismissed successfully"}, 200
-    
+        return {"message": "Notification deleted"}, 200
+
+
 class ThreadListResource(Resource):
     def get(self):
         threads = ForumThread.query.all()
@@ -482,18 +491,16 @@ class MessageListResource(Resource):
         db.session.commit()
         return {'message': 'Message deleted successfully'}
     
-api.add_resource(ThreadListResource, '/threads')
-api.add_resource(MessageListResource, '/threads/<int:thread_id>/messages')
-    
-api.add_resource(NotificationResource, '/notifications', '/notifications/<int:notification_id>')
-
-api.add_resource(IncidentResource, '/incidents', '/incidents/<int:id>')
 api.add_resource(Index, '/')
 api.add_resource(UserResource, '/users', '/users/<int:user_id>')
 api.add_resource(RegisterResource, '/register')
 api.add_resource(LoginResource, '/login')
 api.add_resource(EventResource, '/events', '/events/<int:event_id>')
 api.add_resource(RSVPResource, '/rsvp', '/rsvp/<int:rsvp_id>')
+api.add_resource(IncidentResource, '/incidents', '/incidents/<int:incident_id>')
+api.add_resource(NotificationResource, '/notifications', '/notifications/<int:notification_id>')
+api.add_resource(ThreadListResource, '/threads')
+api.add_resource(MessageListResource, '/threads/<int:thread_id>/messages')
 
 if __name__ == '__main__':
-    app.run(port=5555, debug=True)
+   app.run(port=5555, debug=True)
