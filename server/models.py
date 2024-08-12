@@ -1,4 +1,3 @@
-
 import re
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy.orm import validates
@@ -7,6 +6,7 @@ from datetime import datetime, time
 
 db = SQLAlchemy()
 
+# Existing User model with new relationships for threads and messages
 class User(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(255), nullable=False) 
@@ -19,6 +19,7 @@ class User(db.Model):
     rsvps = db.relationship('RSVP', back_populates='user', cascade='all, delete-orphan', overlaps='events')
     events = db.relationship('Event', secondary='rsvp', back_populates='users', overlaps='rsvps')
 
+   
     @validates('email')
     def validate_email(self, key, email):
         if not re.match(r"[^@]+@[^@]+\.[^@]+", email):
@@ -50,6 +51,23 @@ class User(db.Model):
             "events": [event.id for event in self.events]
         }
 
+class ForumThread(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    title = db.Column(db.String(255), nullable=False)
+    creator_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    creator = db.relationship('User', backref=db.backref('threads', lazy=True))
+    messages = db.relationship('ForumMessage', backref='thread', lazy=True)
+
+class ForumMessage(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    text = db.Column(db.Text, nullable=False)
+    thread_id = db.Column(db.Integer, db.ForeignKey('forum_thread.id'), nullable=False)
+    creator_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    creator = db.relationship('User', backref=db.backref('messages', lazy=True))
+    
+# Other models (Event, RSVP, Incident, Notification) remain unchanged
 class Event(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(100), nullable=False)
