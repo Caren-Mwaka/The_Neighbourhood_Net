@@ -1,7 +1,7 @@
 from flask import Flask, jsonify, request, session
 from flask_migrate import Migrate
 from flask_cors import CORS
-from models import db, User, Event, RSVP, Incident, Notification
+from models import db, User, Event, RSVP, Incident, Notification, ForumThread, ForumMessage
 from flask_bcrypt import Bcrypt
 from flask_jwt_extended import JWTManager, create_access_token, jwt_required, get_jwt_identity
 from flask_restful import Api, Resource
@@ -19,7 +19,7 @@ app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 db.init_app(app)
 bcrypt = Bcrypt(app)
 migrate = Migrate(app, db)
-CORS(app, supports_credentials=True )
+CORS(app, resources={r"/*": {"origins": "*"}})
 jwt = JWTManager(app)
 api = Api(app)
 
@@ -44,6 +44,16 @@ def handle_not_found(e):
 class Index(Resource):
     def get(self):
         return {"index": "Welcome to the Neighbourhood Net"}
+    
+@app.route('/user-info', methods=['GET'])
+@jwt_required()
+def get_user_info():
+    current_user = get_jwt_identity()
+    user = User.query.filter_by(username=current_user['username']).first()
+    if user:
+        return jsonify(user.to_dict()), 200
+    return jsonify({"error": "User not found"}), 404
+
 
 class UserResource(Resource):
     def get(self, user_id=None):
@@ -111,24 +121,20 @@ class RegisterResource(Resource):
         return new_user.to_dict(), 201
 
 class LoginResource(Resource):
-    def post(self):
-        email = request.json.get("email")
-        password = request.json.get("password")
-        
-        print("Email:", email)
-        print("Password:", password)
+   def post(self):
+    email = request.json.get("email")
+    password = request.json.get("password")
 
-        user = User.query.filter_by(email=email).first()
-        if not user:
-            print("User not found")
-            return {"error": "Invalid credentials"}, 401
+    user = User.query.filter_by(email=email).first()
+    if not user:
+        return {"error": "Invalid credentials"}, 401
 
-        if not bcrypt.check_password_hash(user.password, password):
-            print("Password check failed")
-            return {"error": "Invalid credentials"}, 401
+    if not bcrypt.check_password_hash(user.password, password):
+        return {"error": "Invalid credentials"}, 401
 
-        token = create_access_token(identity={'username': user.username, 'role': user.role})
-        return {"message": "Logged in successfully", "token": token, "role": user.role}, 200
+    token = create_access_token(identity={'username': user.username, 'role': user.role})
+    return {"message": "Logged in successfully", "token": token, "role": user.role, "user_id": user.id}, 200
+
 
 def parse_time(time_str):
     try:
@@ -379,7 +385,106 @@ class NotificationResource(Resource):
         notification.dismissed = True
         db.session.commit()
         return {"message": "Notification dismissed successfully"}, 200
+    
+class ThreadListResource(Resource):
+    def get(self):
+        threads = ForumThread.query.all()
+        return jsonify([{
+            'id': thread.id,
+            'title': thread.title,
+            'creator_id': thread.creator_id,
+            'created_at': thread.created_at
+        } for thread in threads])
 
+    def post(self):
+        data = request.json
+        thread = ForumThread(
+            title=data['title'],
+            creator_id=data['creator_id']
+        )
+        db.session.add(thread)
+        db.session.commit()
+        return jsonify({'id': thread.id})
+
+    def delete(self):
+        data = request.json
+        thread_id = data.get('id')
+
+        if not thread_id:
+            return {'error': 'Thread ID is required'}, 400
+
+        thread = ForumThread.query.get(thread_id)
+
+        if not thread:
+            return {'error': 'Thread not found'}, 404
+
+        db.session.delete(thread)
+        db.session.commit()
+        return {'message': 'Thread deleted successfully'}
+
+
+class MessageListResource(Resource):
+    def get(self, thread_id):
+        messages = ForumMessage.query.filter_by(thread_id=thread_id).all()
+        response = []
+        for message in messages:
+            creator = User.query.get(message.creator_id)
+            creator_username = creator.username if creator else 'Unknown User'
+            response.append({
+                'id': message.id,
+                'text': message.text,
+                'creator_id': message.creator_id,
+                'creator_username': creator_username,
+                'created_at': message.created_at
+            })
+        return jsonify(response)
+
+    def post(self, thread_id):
+        data = request.json
+        creator_id = data.get('creator_id')
+        
+        if not creator_id:
+            return {'error': 'Creator ID is required'}, 400
+        
+        message = ForumMessage(
+            text=data['text'],
+            thread_id=thread_id,
+            creator_id=creator_id
+        )
+        db.session.add(message)
+        db.session.commit()
+        
+        # Fetch username
+        creator = User.query.get(creator_id)
+        creator_username = creator.username if creator else 'Unknown User'
+        
+        return jsonify({
+            'id': message.id,
+            'text': message.text,
+            'creator_id': creator_id,
+            'creator_username': creator_username,
+            'created_at': message.created_at
+        })
+
+    def delete(self, thread_id):
+        data = request.json
+        message_id = data.get('id')
+
+        if not message_id:
+            return {'error': 'Message ID is required'}, 400
+
+        message = ForumMessage.query.filter_by(id=message_id, thread_id=thread_id).first()
+
+        if not message:
+            return {'error': 'Message not found'}, 404
+
+        db.session.delete(message)
+        db.session.commit()
+        return {'message': 'Message deleted successfully'}
+
+api.add_resource(ThreadListResource, '/threads')
+api.add_resource(MessageListResource, '/threads/<int:thread_id>/messages')
+    
 api.add_resource(NotificationResource, '/notifications', '/notifications/<int:notification_id>')
 
 api.add_resource(IncidentResource, '/incidents', '/incidents/<int:id>')

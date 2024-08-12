@@ -1,30 +1,197 @@
-import React, { useState } from 'react';
-import './Forum.css';
-import user1Image from '../assets/Profile.jpeg';
-import user2Image from '../assets/Profile.jpeg';
-import user3Image from '../assets/Profile.jpeg';
-import logoImage from '../assets/neighbourhood-net-logo.png';
+import React, { useState, useEffect } from "react";
+import "./Forum.css";
+import logoImage from "../assets/neighbourhood-net-logo.png";
 
 const Forum = () => {
-  const users = [
-    { name: 'Main', image: user1Image },
-    { name: 'Dr. Catherine', image: user2Image },
-    { name: 'Ian Thiong’o', image: user3Image },
-  ];
-  const [selectedUser, setSelectedUser] = useState(users[0]);
-  const [threads, setThreads] = useState({
-    'Main': [{ id: 1, user: 'Lydia', text: 'Hello everyone! 👋', image: user1Image }],
-    'Dr. Catherine': [{ id: 2, user: 'Dr. Catherine', text: 'Hello, Lydia 👋 I hope you and your family are well and healthy', image: user2Image }],
-    'Ian Thiong’o': [],
-  });
-  const [newMessage, setNewMessage] = useState('');
-  const [searchTerm, setSearchTerm] = useState('');
+  const [users, setUsers] = useState([]);
+  const [threads, setThreads] = useState([]);
+  const [selectedThread, setSelectedThread] = useState(null);
+  const [messages, setMessages] = useState([]);
+  const [newMessage, setNewMessage] = useState("");
+  const [newThreadTitle, setNewThreadTitle] = useState("");
+  const [searchTerm, setSearchTerm] = useState("");
+  const [loggedInUserId, setLoggedInUserId] = useState(null);
+  const [contextMenuVisible, setContextMenuVisible] = useState(false);
+  const [contextMenuPosition, setContextMenuPosition] = useState({ x: 0, y: 0 });
+  const [itemToDelete, setItemToDelete] = useState(null);
 
-  const handleSend = () => {
-    if (newMessage.trim()) {
-      const newThread = [...(threads[selectedUser.name] || []), { id: Date.now(), user: 'Current User', text: newMessage, image: user1Image }];
-      setThreads({ ...threads, [selectedUser.name]: newThread });
-      setNewMessage('');
+  useEffect(() => {
+    const fetchUserInfo = async () => {
+      try {
+        const response = await fetch("http://localhost:5555/user-info", {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("token")}`,
+          },
+        });
+        const data = await response.json();
+        setLoggedInUserId(data.id);
+      } catch (error) {
+        console.error("Failed to fetch user info:", error);
+      }
+    };
+
+    fetchUserInfo();
+  }, []);
+
+  useEffect(() => {
+    const fetchUsers = async () => {
+      try {
+        const response = await fetch("http://localhost:5555/users");
+        const data = await response.json();
+        setUsers(data.users);
+      } catch (error) {
+        console.error("Failed to fetch users:", error);
+      }
+    };
+
+    fetchUsers();
+  }, []);
+
+  useEffect(() => {
+    const fetchThreads = async () => {
+      try {
+        const response = await fetch("http://localhost:5555/threads");
+        const data = await response.json();
+        setThreads(data);
+      } catch (error) {
+        console.error("Failed to fetch threads:", error);
+      }
+    };
+
+    fetchThreads();
+  }, []);
+
+  useEffect(() => {
+    const fetchMessages = async () => {
+      if (selectedThread) {
+        try {
+          const response = await fetch(
+            `http://localhost:5555/threads/${selectedThread.id}/messages`
+          );
+          const data = await response.json();
+          setMessages(data);
+        } catch (error) {
+          console.error("Failed to fetch messages:", error);
+        }
+      }
+    };
+
+    fetchMessages();
+  }, [selectedThread]);
+
+  const getUsernameById = (userId) => {
+    const user = users.find((user) => user.id === userId);
+    return user ? user.username : "Unknown User";
+  };
+
+  const handleSend = async () => {
+    if (newMessage.trim() && selectedThread) {
+      try {
+        const response = await fetch(
+          `http://localhost:5555/threads/${selectedThread.id}/messages`,
+          {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `Bearer ${localStorage.getItem("token")}`,
+            },
+            body: JSON.stringify({
+              text: newMessage,
+              creator_id: loggedInUserId,
+            }),
+          }
+        );
+
+        if (!response.ok) {
+          const errorData = await response.json();
+          throw new Error(errorData.error || "Failed to send message");
+        }
+
+        const data = await response.json();
+        setMessages((prevMessages) => [...prevMessages, data]);
+        setNewMessage("");
+      } catch (error) {
+        console.error("Error:", error);
+      }
+    }
+  };
+
+  const handleThreadDelete = async (threadId) => {
+    try {
+      const response = await fetch(
+        `http://localhost:5555/threads/${threadId}`,
+        {
+          method: "DELETE",
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("token")}`,
+          },
+        }
+      );
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error || "Failed to delete thread");
+      }
+
+      setThreads(threads.filter((thread) => thread.id !== threadId));
+      setSelectedThread(null);
+      setMessages([]);
+      setContextMenuVisible(false);
+    } catch (error) {
+      console.error("Error:", error);
+    }
+  };
+
+  const handleMessageDelete = async (messageId) => {
+    try {
+      const response = await fetch(
+        `http://localhost:5555/messages/${messageId}`,
+        {
+          method: "DELETE",
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("token")}`,
+          },
+        }
+      );
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error || "Failed to delete message");
+      }
+
+      setMessages(messages.filter((message) => message.id !== messageId));
+      setContextMenuVisible(false);
+    } catch (error) {
+      console.error("Error:", error);
+    }
+  };
+
+  const handleCreateThread = async () => {
+    if (newThreadTitle.trim()) {
+      try {
+        const response = await fetch("http://localhost:5555/threads", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${localStorage.getItem("token")}`,
+          },
+          body: JSON.stringify({
+            title: newThreadTitle,
+            creator_id: loggedInUserId,
+          }),
+        });
+
+        if (!response.ok) {
+          const errorData = await response.json();
+          throw new Error(errorData.error || "Failed to create thread");
+        }
+
+        const data = await response.json();
+        setThreads([...threads, data]);
+        setNewThreadTitle("");
+      } catch (error) {
+        console.error("Error:", error);
+      }
     }
   };
 
@@ -32,8 +199,71 @@ const Forum = () => {
     setSearchTerm(event.target.value);
   };
 
-  const handleUserSelect = (user) => {
-    setSelectedUser(user);
+  const handleThreadSelect = (thread) => {
+    setSelectedThread(thread);
+  };
+
+  const handleThreadClick = (thread) => {
+    if (thread.creator_id === loggedInUserId) {
+      setContextMenuPosition({ x: 0, y: 0 });
+      setItemToDelete({ item: thread, type: 'threads' });
+      setContextMenuVisible(true);
+    } else {
+      handleThreadSelect(thread);
+    }
+  };
+
+  const handleMessageClick = (message) => {
+    if (message.creator_id === loggedInUserId) {
+      setContextMenuPosition({ x: 0, y: 0 });
+      setItemToDelete({ item: message, type: 'messages' });
+      setContextMenuVisible(true);
+    }
+  };
+
+  const handleContextMenu = (event, item, type) => {
+    event.preventDefault();
+    setContextMenuPosition({ x: event.clientX, y: event.clientY });
+    setItemToDelete({ item, type });
+    setContextMenuVisible(true);
+  };
+
+  const handleDelete = async () => {
+    if (!itemToDelete) return;
+
+    const { item, type } = itemToDelete;
+    try {
+      const response = await fetch(
+        `http://localhost:5555/${type}/${item.id}`,
+        {
+          method: "DELETE",
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("token")}`,
+          },
+        }
+      );
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error || `Failed to delete ${type}`);
+      }
+
+      if (type === 'threads') {
+        setThreads(threads.filter((thread) => thread.id !== item.id));
+        setSelectedThread(null);
+        setMessages([]);
+      } else if (type === 'messages') {
+        setMessages(messages.filter((message) => message.id !== item.id));
+      }
+
+      setContextMenuVisible(false);
+    } catch (error) {
+      console.error("Error:", error);
+    }
+  };
+
+  const handleCancel = () => {
+    setContextMenuVisible(false);
   };
 
   return (
@@ -51,34 +281,54 @@ const Forum = () => {
       </nav>
       <div className="main-content">
         <div className="sidebar">
-          <h2>Direct Messages</h2>
+          <h2>Threads</h2>
           <ul>
-            {users.map((user) => (
-              <li key={user.name} onClick={() => handleUserSelect(user)} className={selectedUser === user ? 'selected' : ''}>
-                <img src={user.image} alt={user.name} className="user-image" />
-                {user.name}
-              </li>
-            ))}
+            {threads
+              .filter(
+                (thread) =>
+                  thread.title &&
+                  thread.title.toLowerCase().includes(searchTerm.toLowerCase())
+              )
+              .map((thread) => (
+                <li
+                  key={thread.id}
+                  onContextMenu={(e) => handleContextMenu(e, thread, 'threads')}
+                  onClick={() => handleThreadClick(thread)}
+                  className={selectedThread === thread ? "selected" : ""}
+                >
+                  {thread.title}
+                </li>
+              ))}
           </ul>
+
+          <input
+            type="text"
+            placeholder="New thread title"
+            value={newThreadTitle}
+            onChange={(e) => setNewThreadTitle(e.target.value)}
+          />
+          <button onClick={handleCreateThread}>Create Thread</button>
           <button className="notifications">Notifications</button>
         </div>
         <div className="chat-window">
           <div className="chat-header">
-            {selectedUser.name === 'Anonymous' ? (
-              <h2>Main Chat Box</h2>
+            {selectedThread ? (
+              <h2>Discussion on {selectedThread.title}</h2>
             ) : (
-              <h2>Chat with {selectedUser.name}</h2>
+              <h2>Select a thread to start chatting</h2>
             )}
           </div>
           <div className="messages">
-            {(threads[selectedUser.name] || [])
-              .filter((message) => message.text.toLowerCase().includes(searchTerm.toLowerCase()))
-              .map((message) => (
-                <div key={message.id} className="message">
-                  <img src={message.image} alt={message.user} className="user-image" />
-                  <strong>{message.user}</strong>: {message.text}
-                </div>
-              ))}
+            {messages.map((message) => (
+              <div
+                key={message.id}
+                className="message"
+                onContextMenu={(e) => handleContextMenu(e, message, 'messages')}
+                onClick={() => handleMessageClick(message)}
+              >
+                <strong>{getUsernameById(message.creator_id)}</strong>: {message.text}
+              </div>
+            ))}
           </div>
           <div className="message-input">
             <input
@@ -91,6 +341,15 @@ const Forum = () => {
           </div>
         </div>
       </div>
+      {contextMenuVisible && (
+        <div
+          className="context-menu"
+          style={{ top: `${contextMenuPosition.y}px`, left: `${contextMenuPosition.x}px` }}
+        >
+          <button onClick={handleDelete}>Delete</button>
+          <button onClick={handleCancel}>Cancel</button>
+        </div>
+      )}
     </div>
   );
 };
