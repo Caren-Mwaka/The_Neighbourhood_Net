@@ -8,18 +8,17 @@ import protectImage from '../assets/images/protect.jpeg';
 import engageImage from '../assets/images/engage.jpeg'; 
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faAddressBook } from '@fortawesome/free-solid-svg-icons';
-import ContactSection from './ContactSection';
 
 const LandingPage = () => {
   return (
     <>
-      <div className="section landing-section" style={{ backgroundImage: `url(${backgroundImage})` }}>
+      <div className="landing-section section" style={{ backgroundImage: `url(${backgroundImage})` }}>
         <header className="app-bar">
           <div className="app-bar-links">
-            <a href="#contact" className="contact-link">
+            <Link to="/contact" className="contact-link">
               <FontAwesomeIcon icon={faAddressBook} size="2x" />
               <span>Contact Us</span>
-            </a>
+            </Link>
             <Link to="/about">About</Link>
           </div>
           <div className="right-links">
@@ -28,12 +27,12 @@ const LandingPage = () => {
           </div>
         </header>
         <div className="logo-container">
-        <div className="logo-background">
-          <img src={logoImage} alt="Logo" className="logo-image" />
+          <div className="logo-background">
+            <img src={logoImage} alt="Logo" className="logo-image" />
           </div>
         </div>
       </div>
-      <div className="section welcome-section">
+      <div className="welcome-section section">
         <h1>Welcome to The Neighborhood Net</h1>
         <p>Your Local Community Watch and Engagement Platform</p>
         <div className="images-container">
@@ -50,9 +49,6 @@ const LandingPage = () => {
             <div className="image-caption">ENGAGE</div>
           </div>
         </div>
-      </div>
-      <div className="section contact-section">
-        <ContactSection />
       </div>
     </>
   );
