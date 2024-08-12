@@ -55,7 +55,7 @@ function LoginPage() {
 
       toast.success("Login successful!");
       localStorage.setItem("token", data.token);
-      localStorage.setItem("user_id", data.user_id); // Save user_id to localStorage
+      localStorage.setItem("user_id", data.user_id); 
       localStorage.setItem("refreshToken", data.refreshToken); 
       localStorage.setItem("role", data.role);
 
