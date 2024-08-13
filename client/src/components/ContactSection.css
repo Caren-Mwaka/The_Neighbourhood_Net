@@ -1,170 +1,173 @@
-
 body, html {
-    margin: 0;
-    padding: 0;
-    width: 100%;
-    height: 100%;
-    font-family: 'Helvetica Neue', sans-serif; /* Font type */
-    background: linear-gradient(180deg, #0c6ed1 0%, #3e9fc0 100%); /* Background color */
-  }
-  
-  .section {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    height: 100vh;
-  }
-  
+  margin: 0;
+  padding: 0;
+  width: 100%;
+  height: 100%;
+  font-family: 'Arial', sans-serif;
+  background: linear-gradient(180deg, #4e958b 0%, #192F2C 100%);
+}
+
+.section {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+}
+
+.container {
+  max-width: 900px;
+  margin: 0 auto;
+  display: flex;
+  align-items: flex-start;
+  background: rgba(0, 0, 0, 0.6);
+  padding: 40px;
+  border-radius: 10px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  backdrop-filter: blur(10px);
+  width: 80%;
+  position: relative; /* Added position relative */
+}
+
+.logo {
+  width: 100px;
+  height: auto;
+  position: absolute;
+  top: 10px;
+  left: 10px;
+}
+
+.logo img {
+  width: 100%;
+  height: auto;
+}
+
+.content {
+  flex: 1;
+  padding-right: 50px;
+  padding-top: 90px;  /* Adjusted padding to lower the contact info */
+}
+
+.content h2 {
+  font-size: 2.5rem;
+  margin-bottom: 20px;
+  color: #fff;
+}
+
+.content p {
+  font-size: 1.2rem;
+  margin-bottom: 10px;
+  color: #b0bec5;
+}
+
+.contact {
+  display: flex;
+  flex-direction: column;
+  margin-top: 20px;  /* Added margin to lower the contact info */
+}
+
+.contact div {
+  display: flex;
+  align-items: center;
+  margin-bottom: 10px;
+}
+
+.contact i {
+  font-size: 1.5rem;
+  margin-right: 10px;
+  color: #fff;
+}
+
+.contact span {
+  color: #fff;
+}
+
+.form-container {
+  width: 100%;
+  max-width: 400px;
+}
+
+.form {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+}
+
+.input-field {
+  margin-bottom: 20px;
+}
+
+.input-field input,
+.input-field textarea {
+  width: 100%;
+  padding: 15px;
+  border: none;
+  border-radius: 5px;
+  background-color: rgba(255, 255, 255, 0.2);
+  color: #fff;
+  font-size: 1rem;
+}
+
+.input-field textarea {
+  resize: vertical;
+}
+
+.btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  padding: 15px;
+  border: none;
+  border-radius: 5px;
+  background-color: #192f2c !important;  /* Updated button color */
+  color: #004d40;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.btn:hover {
+  background-color: #4e958b !important;  /* Updated hover color */
+}
+
+.btn i {
+  margin-left: 10px;
+}
+
+.btn .MuiSvgIcon-root {
+  font-size: 1.5rem;
+  margin-left: 10px;
+}
+
+.telegram-icon {
+  position: absolute;
+  bottom: 20px;
+  left: 20px;
+  color: white;
+}
+
+@media (max-width: 768px) {
   .container {
-    max-width: 900px;
-    margin: 0 auto;
-    display: flex;
-    align-items: flex-start;
-    background: linear-gradient(180deg, rgba(12, 183, 189, 0.068) 0%, rgba(255, 255, 255, 1) 50%); /* Background color gradient */
-    padding: 40px;
-    border-radius: 10px;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-    width: 80%;
-    position: relative;
-  }
-  
-  .logo {
-    width: 100px;
-    height: auto;
-    position: absolute;
-    top: 20px;
-    left: 20px;
-  }
-  
-  .logo img {
-    width: 100%;
-    height: auto;
-  }
-  
-  .content {
-    flex: 1;
-    padding-right: 50px;
-    padding-top: 90px;
-  }
-  
-  .content h2 {
-    font-size: 2.5rem;
-    margin-bottom: 20px;
-    color: #000; 
-  }
-  
-  .content p {
-    font-size: 1.2rem;
-    margin-bottom: 10px;
-    color: #000;
-  }
-  
-  .contact {
-    display: flex;
     flex-direction: column;
-    margin-top: 20px;
+    align-items: flex-start;
   }
-  
-  .contact div {
-    display: flex;
-    align-items: center;
-    margin-bottom: 10px;
+
+  .content {
+    padding-right: 0;
+    margin-bottom: 30px;
   }
-  
-  .contact i {
-    font-size: 1.5rem;
-    margin-right: 10px;
-    color: #000; 
-  }
-  
-  .contact span {
-    color: #0f0e0e; 
-  }
-  
+
   .form-container {
     width: 100%;
-    max-width: 400px;
   }
-  
-  .form {
-    display: flex;
-    flex-direction: column;
-    width: 100%;
-  }
-  
-  .input-field {
+
+  .logo {
+    position: static;
     margin-bottom: 20px;
   }
-  
-  .input-field input,
-  .input-field textarea {
-    width: 100%;
-    padding: 15px;
-    border: none;
-    border-radius: 5px;
-    background-color: rgba(187, 58, 58, 0.7); 
-    color: #000; 
-    font-size: 1rem;
-  }
-  
-  .input-field textarea {
-    resize: vertical;
-  }
-  
-  .btn {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    width: 100%;
-    padding: 15px;
-    border: none;
-    border-radius: 5px;
-    background-color: #aab9b7 !important;
-    color: #6c7775;
-    font-size: 1rem;
-    cursor: pointer;
-    transition: background-color 0.3s ease;
-  }
-  
-  .btn:hover {
-    background-color: #25a18f !important;
-  }
-  
-  .btn i {
-    margin-left: 10px;
-  }
-  
-  .btn .MuiSvgIcon-root {
-    font-size: 1.5rem;
-    margin-left: 10px;
-  }
-  
+
   .telegram-icon {
-    bottom: 20px;
-    left: 20px;
-    color: rgb(196, 180, 180);
-    font-size: 2rem;
-    float: left;
+    position: static;
+    margin-top: 20px;
   }
-  
-  @media (max-width: 768px) {
-    .container {
-        flex-direction: column;
-        align-items: flex-start;
-    }
-  
-    .content {
-        padding-right: 0;
-        margin-bottom: 30px;
-    }
-  
-    .form-container {
-        width: 100%;
-    }
-  
-    .logo {
-        position: static;
-        margin-bottom: 20px;
-    }
-  }
-  
+}

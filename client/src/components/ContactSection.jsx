@@ -1,6 +1,5 @@
-
 import React from 'react';
-import logo from '../assets/neighbourhood-net-logo.png'
+import logo from '../assets/neighbourhood-net-logo.png'; // Adjust the path as necessary
 import TelegramIcon from '@mui/icons-material/Telegram';
 import ArrowForwardIcon from '@mui/icons-material/ArrowForward';
 import PhoneIcon from '@mui/icons-material/Phone';
@@ -75,7 +74,7 @@ const ContactSection = () => {
               helperText={formik.touched.email && formik.errors.email}
               margin="normal"
               InputLabelProps={{ style: { color: '#fff' } }}
-              InputProps={{ style: { color: '#ffff' } }}
+              InputProps={{ style: { color: '#fff' } }}
             />
             <TextField
               fullWidth
@@ -96,9 +95,9 @@ const ContactSection = () => {
               Send Message <ArrowForwardIcon />
             </Button>
           </form>
-          <div className="telegram-icon">
-            <TelegramIcon style={{ fontSize: 70 }} />
-          </div>
+        </div>
+        <div className="telegram-icon">
+          <TelegramIcon style={{ fontSize: 70 }} />
         </div>
       </div>
     </section>

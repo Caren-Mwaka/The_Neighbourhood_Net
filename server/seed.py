@@ -1,7 +1,6 @@
 from app import app, db, bcrypt
-from models import User, Event, RSVP, Incident, Notification
+from models import User, Event, RSVP, Incident, Notification, ForumThread, ForumMessage
 from datetime import datetime, time
-
 
 users = [
     {'name': 'Alice Smith', 'username': 'alice', 'email': 'alice@example.com', 'password': 'Password123!', 'role': 'admin'},
@@ -46,26 +45,34 @@ notifications = [
     {'title': 'Weekly Roundup', 'message': 'Here’s what happened in your neighborhood this week.', 'date': '2024-08-11'},
 ]
 
-
 def parse_time(time_str):
     return time(*map(int, time_str.split(':'))) if time_str else None
 
+forum_threads = [
+    {'title': 'General Discussion', 'creator_id': 1},
+    {'title': 'Event Planning', 'creator_id': 2},
+]
+
+forum_messages = [
+    {'text': 'Hello everyone, welcome to the forum!', 'thread_id': 1, 'creator_id': 1, 'created_at': datetime.now()},
+    {'text': 'Looking forward to the next event!', 'thread_id': 2, 'creator_id': 2, 'created_at': datetime.now()},
+]
 
 with app.app_context():
     db.drop_all()
     db.create_all()
 
-    
     for user_data in users:
-        db.session.add(User(
+        user = User(
             name=user_data['name'],
             username=user_data['username'],
             email=user_data['email'],
             password=bcrypt.generate_password_hash(user_data['password']).decode('utf-8'),
             role=user_data.get('role', 'user')
-        ))
+        )
+        db.session.add(user)
+        db.session.commit()
 
-   
     for event_data in events:
         db.session.add(Event(
             name=event_data['name'],
@@ -77,8 +84,8 @@ with app.app_context():
         ))
 
     for rsvp_data in rsvps:
-            rsvp = RSVP(**rsvp_data)
-            db.session.add(rsvp)
+        rsvp = RSVP(**rsvp_data)
+        db.session.add(rsvp)
 
     for incident_data in incidents:
         db.session.add(Incident(
@@ -97,5 +104,20 @@ with app.app_context():
             date=datetime.strptime(notification_data['date'], '%Y-%m-%d').date()
         ))
 
+    for thread_data in forum_threads:
+        db.session.add(ForumThread(
+            title=thread_data['title'],
+            creator_id=thread_data['creator_id']
+        ))
+
+    for message_data in forum_messages:
+        db.session.add(ForumMessage(
+            text=message_data['text'],
+            thread_id=message_data['thread_id'],
+            creator_id=message_data['creator_id'],
+            created_at=message_data['created_at']
+        ))
+        
     db.session.commit()
+
     print("Database seeded successfully!")

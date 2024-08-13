@@ -1,0 +1,247 @@
+.profileContainer {
+    background-color: #4E958B;
+    padding: 0 10px;
+    overflow: hidden;
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+  
+  .contentWrapper {
+    display: flex;
+    gap: 20px;
+    width: 100%;
+    max-width: 1200px;
+    padding-bottom: 6px;
+  }
+  
+  .sidebarColumn {
+    display: flex;
+    flex-direction: column;
+    line-height: normal;
+    height: auto;
+    width: 28%;
+    margin-left: 0;
+    padding: 13px;
+    padding-bottom: 1px;
+  }
+  
+  .sidebar {
+    background-color: #4eaaa4;
+    display: flex;
+    flex-grow: 1;
+    flex-direction: column;
+    align-items: center;
+    color: #000;
+    width: 100%;
+    padding: 2px 42px 97px 19px;
+    font: 400 24px Inter, sans-serif;
+    border-radius: 10px;
+  }
+  
+  .sidebarTitle {
+    font-size: 36px;
+    align-self: auto;
+  }
+  
+  .profileImage {
+    aspect-ratio: 1.1;
+    object-fit: cover;
+    object-position: center;
+    width: 100%;
+    max-width: 200px;
+    border-radius: 50%;
+    align-self: auto;
+    margin-top: 47px;
+  }
+  
+  .uploadButton {
+    margin-top: 38px;
+    cursor: pointer;
+    background-color: #053a3e;
+    color: #d9d9d9;
+    padding: 10px 20px;
+    border-radius: 20px;
+    transition: background-color 0.3s ease;
+  }
+  
+  .uploadButton:hover {
+    background-color: #075056;
+  }
+  
+  .logoutButton {
+    background-blend-mode: normal;
+    border-radius: 20px;
+    background-color: #053a3e;
+    margin-top: auto;
+    width: 132px;
+    max-width: 100%;
+    color: #d9d9d9;
+    font-weight: 900;
+    white-space: nowrap;
+    padding: 12px 24px;
+    cursor: pointer;
+    border: none;
+    transition: background-color 0.3s ease;
+  }
+  
+  .logoutButton:hover {
+    background-color: #075056;
+  }
+  
+  .mainColumn {
+    display: flex;
+    flex-direction: column;
+    line-height: normal;
+    width: 72%;
+    margin-left: 20px;
+    padding: 0;
+  }
+  
+  .mainContent {
+    position: relative;
+    display: flex;
+    margin-top: 12px;
+    width: 100%;
+    flex-direction: column;
+    align-items: start;
+    color: #000;
+    font: 400 24px Inter, sans-serif;
+    background-color: #ffffff;
+    padding: 30px;
+    border-radius: 10px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  }
+  
+  .headerWrapper {
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    width: 100%;
+    margin-bottom: 30px;
+    padding-right: 20px;
+    padding: 10px;
+  }
+  
+  .headerImage {
+    aspect-ratio: 1.01;
+    object-fit: cover;
+    object-position: center;
+    width: 100px;
+    height: 100px;
+    border-radius: 50%;
+    max-width: 100%;
+  }
+  
+  .formLabel {
+    margin-top: 0px;
+    display: block;
+  }
+  
+  .formInput {
+    background-color: #f0f0f0;
+    border: 1px solid #d9d9d9;
+    border-radius: 5px;
+    margin-top: 10px;
+    height: 43px;
+    width: 100%;
+    max-width: 456px;
+    padding: 0 10px;
+    font-size: 38px;
+  }
+  
+  .passwordInputWrapper {
+    display: flex;
+    align-items: center;
+    position: relative;
+  }
+  
+  .passwordToggleButton {
+    background: none;
+    border: none;
+    cursor: pointer;
+    position: absolute;
+    right: 10px;
+    top: 50%;
+    transform: translateY(-30%);
+  }
+  .updateButton {
+    border-radius: 20px;
+    background-color: #46baaa;
+    align-self: center;
+    margin-top: 40px;
+    width: 281px;
+    max-width: 100%;
+    padding: 11px 31px;
+    cursor: pointer;
+    border: none;
+    color: #ffffff;
+    font-size: 18px;
+    font-weight: bold;
+    transition: background-color 0.3s ease;
+  }
+  
+  .updateButton:hover {
+    background-color: #3da799;
+  }
+  
+  .visuallyHidden {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border: 0;
+  }
+  
+  @media (max-width: 991px) {
+    .contentWrapper {
+      flex-direction: column;
+      align-items: stretch;
+      gap: 30px;
+    }
+  
+    .sidebarColumn,
+    .mainColumn {
+      width: 100%;
+      margin-left: 0;
+    }
+  
+    .sidebar {
+      margin-top: 20px;
+      padding: 30px 20px;
+    }
+  
+    .profileImage {
+      margin-top: 30px;
+    }
+  
+    .logoutButton {
+      margin-top: 30px;
+      white-space: normal;
+      padding: 10px 20px;
+    }
+  
+    .mainContent {
+      max-width: 100%;
+      margin-top: 20px;
+    }
+  
+    .headerWrapper {
+      flex-direction: column-reverse;
+      align-items: center;
+    }
+  
+    .formInput {
+      max-width: 100%;
+    }
+  
+    .updateButton {
+      margin-top: 30px;
+      padding: 10px 20px;
+    }
+  }

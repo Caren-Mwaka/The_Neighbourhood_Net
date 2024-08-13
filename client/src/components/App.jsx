@@ -6,9 +6,12 @@ import LandingPage from "./LandingPage";
 import RegisterPage from "./RegisterPage";
 import Navigation from "./Navigation";
 import IncidentPage from "./IncidentPage";
+import Forum from "./Forum"
+import Profile from "./Profile";
 import "./App.css";
 import About from "./About";
 import EventsList from "./EventsList";
+import ContactSection from "./ContactSection"; // Import the ContactSection component
 import NotificationList from "./NotificationList";
 import AdminDashboard from './AdminDashboard'
 import { ToastContainer, toast } from 'react-toastify';
@@ -44,6 +47,18 @@ const router = createBrowserRouter([
     element: <About />,
   },
   {
+    path: "/community-forum",
+    element: <Forum />,
+  },
+  {
+    path: "/profile",
+    element: (
+      <MainLayout>
+        <Profile />
+      </MainLayout>
+    ),
+  },
+  {
     path: "/events",
     element: (
       <MainLayout>
@@ -74,6 +89,10 @@ const router = createBrowserRouter([
         <NotificationList/>
       </MainLayout>
     ),
+  },
+  {
+    path: "/contact", // Add the route for the contact section
+    element: <ContactSection />, 
   },
 ]);
 
