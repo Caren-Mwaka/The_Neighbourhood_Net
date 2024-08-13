@@ -1,4 +1,6 @@
 import React, { useState, useEffect } from "react";
+import { toast, ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 import styles from "./Profile.module.css";
 import { Visibility, VisibilityOff } from "@mui/icons-material";
 
@@ -38,8 +40,10 @@ const Profile = () => {
       }
 
       const data = await response.json();
+      toast.success("Profile updated successfully!");
       console.log("Profile updated successfully:", data);
     } catch (error) {
+      toast.error("Error updating profile. Please try again.");
       console.error("Error updating profile:", error);
     }
   };
@@ -57,13 +61,13 @@ const Profile = () => {
 
   const handleLogout = () => {
     console.log("Logout clicked");
-    localStorage.removeItem("user_id"); // Optionally remove user ID on logout
+    localStorage.removeItem("user_id");
     // Redirect to login page or handle logout logic
   };
 
   useEffect(() => {
     const fetchProfile = async () => {
-      const userId = localStorage.getItem("user_id"); // Assuming user ID is stored in local storage after login
+      const userId = localStorage.getItem("user_id");
       try {
         const response = await fetch(`/api/profile?user_id=${userId}`);
         if (!response.ok) {
@@ -75,9 +79,9 @@ const Profile = () => {
           email: data.email || "",
           contactNumber: data.contactNumber || "",
           address: data.address || "",
-          password: "", // Password should not be prefilled for security reasons
+          password: "",
         });
-        setAvatar(data.avatar || null); // Persist the profile image
+        setAvatar(data.avatar || null);
       } catch (error) {
         console.error("Error fetching profile:", error);
       }
@@ -92,6 +96,7 @@ const Profile = () => {
 
   return (
     <div className={styles.profileContainer}>
+      <ToastContainer />
       <div className={styles.contentWrapper}>
         <div className={styles.sidebarColumn}>
           <aside className={styles.sidebar}>
