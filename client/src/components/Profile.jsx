@@ -1,6 +1,5 @@
-
 import React, { useState, useEffect } from "react";
-import styles from "./Profile.module.css"; // Updated import to use CSS Modules
+import styles from "./Profile.module.css";
 import { Visibility, VisibilityOff } from "@mui/icons-material";
 
 const Profile = () => {
@@ -31,7 +30,7 @@ const Profile = () => {
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify(formData),
+        body: JSON.stringify({ ...formData, avatar }),
       });
 
       if (!response.ok) {
@@ -58,18 +57,27 @@ const Profile = () => {
 
   const handleLogout = () => {
     console.log("Logout clicked");
+    localStorage.removeItem("user_id"); // Optionally remove user ID on logout
+    // Redirect to login page or handle logout logic
   };
 
   useEffect(() => {
     const fetchProfile = async () => {
-      const username = formData.username;
+      const userId = localStorage.getItem("user_id"); // Assuming user ID is stored in local storage after login
       try {
-        const response = await fetch(`/api/profile?username=${username}`);
+        const response = await fetch(`/api/profile?user_id=${userId}`);
         if (!response.ok) {
           throw new Error("Failed to fetch profile");
         }
         const data = await response.json();
-        setFormData(data);
+        setFormData({
+          username: data.username || "",
+          email: data.email || "",
+          contactNumber: data.contactNumber || "",
+          address: data.address || "",
+          password: "", // Password should not be prefilled for security reasons
+        });
+        setAvatar(data.avatar || null); // Persist the profile image
       } catch (error) {
         console.error("Error fetching profile:", error);
       }
@@ -172,7 +180,7 @@ const Profile = () => {
                 type={showPassword ? "text" : "password"}
                 id="password"
                 name="password"
-                className={styles.formInput} // Use styles.formInput for consistency
+                className={styles.formInput}
                 value={formData.password}
                 onChange={handleInputChange}
               />
