@@ -1,5 +1,5 @@
 import React from 'react';
-import logo from '../assets/neighbourhood-net-logo.png'; // Adjust the path as necessary
+import logo from '../assets/neighbourhood-net-logo.png';
 import TelegramIcon from '@mui/icons-material/Telegram';
 import ArrowForwardIcon from '@mui/icons-material/ArrowForward';
 import PhoneIcon from '@mui/icons-material/Phone';
@@ -23,8 +23,31 @@ const ContactSection = () => {
       message: '',
     },
     validationSchema: validationSchema,
-    onSubmit: (values) => {
-      alert(JSON.stringify(values, null, 2));
+    onSubmit: (values, { resetForm }) => {
+      fetch('http://localhost:5555/contact-messages', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          full_name: values.fullName,  // Match the keys with your Flask backend
+          email: values.email,
+          message: values.message,
+        }),
+      })
+        .then((response) => {
+          if (!response.ok) {
+            throw new Error('Network response was not ok');
+          }
+          return response.json();
+        })
+        .then((data) => {
+          console.log('Success:', data);
+          resetForm(); // Clear the form on successful submission
+        })
+        .catch((error) => {
+          console.error('Error:', error);
+        });
     },
   });
 

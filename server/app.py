@@ -1,7 +1,7 @@
 from flask import Flask, jsonify, request, session
 from flask_migrate import Migrate
 from flask_cors import CORS
-from models import db, User, Event, RSVP, Incident, Notification, ForumThread, ForumMessage
+from models import db, User, Event, RSVP, Incident, Notification, ForumThread, ForumMessage, ContactMessage
 from flask_bcrypt import Bcrypt
 from flask_jwt_extended import JWTManager, create_access_token, jwt_required, get_jwt_identity
 from flask_restful import Api, Resource
@@ -490,7 +490,22 @@ class MessageListResource(Resource):
         db.session.delete(message)
         db.session.commit()
         return {'message': 'Message deleted successfully'}
-    
+class ContactMessageResource(Resource):
+    def post(self):
+        data = request.get_json()
+        full_name = data.get('full_name')
+        email = data.get('email')
+        message = data.get('message')
+
+        if not full_name or not email or not message:
+            return jsonify({"error": "Missing fields"}), 400
+
+        new_message = ContactMessage(full_name=full_name, email=email, message=message)
+        db.session.add(new_message)
+        db.session.commit()
+
+        return new_message.to_dict(), 201
+  
 api.add_resource(Index, '/')
 api.add_resource(UserResource, '/users', '/users/<int:user_id>')
 api.add_resource(RegisterResource, '/register')
@@ -501,6 +516,8 @@ api.add_resource(IncidentResource, '/incidents', '/incidents/<int:incident_id>')
 api.add_resource(NotificationResource, '/notifications', '/notifications/<int:notification_id>')
 api.add_resource(ThreadListResource, '/threads')
 api.add_resource(MessageListResource, '/threads/<int:thread_id>/messages')
+api.add_resource(ContactMessageResource, '/contact-messages')
+
 
 if __name__ == '__main__':
    app.run(port=5555, debug=True)
