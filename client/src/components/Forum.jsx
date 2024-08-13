@@ -12,9 +12,14 @@ const Forum = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [loggedInUserId, setLoggedInUserId] = useState(null);
   const [contextMenuVisible, setContextMenuVisible] = useState(false);
-  const [contextMenuPosition, setContextMenuPosition] = useState({ x: 0, y: 0 });
+  const [contextMenuPosition, setContextMenuPosition] = useState({
+    x: 0,
+    y: 0,
+  });
   const [itemToDelete, setItemToDelete] = useState(null);
+  const [creatingThread, setCreatingThread] = useState(false);
 
+  // Fetch user info
   useEffect(() => {
     const fetchUserInfo = async () => {
       try {
@@ -33,6 +38,7 @@ const Forum = () => {
     fetchUserInfo();
   }, []);
 
+  // Fetch users
   useEffect(() => {
     const fetchUsers = async () => {
       try {
@@ -47,6 +53,7 @@ const Forum = () => {
     fetchUsers();
   }, []);
 
+  // Fetch threads
   useEffect(() => {
     const fetchThreads = async () => {
       try {
@@ -61,22 +68,29 @@ const Forum = () => {
     fetchThreads();
   }, []);
 
+  // Fetch messages when a thread is selected
   useEffect(() => {
-    const fetchMessages = async () => {
-      if (selectedThread) {
+    if (selectedThread) {
+      const fetchMessages = async () => {
         try {
           const response = await fetch(
             `http://localhost:5555/threads/${selectedThread.id}/messages`
           );
+          if (!response.ok) {
+            throw new Error("Network response was not ok");
+          }
           const data = await response.json();
+          if (!Array.isArray(data)) {
+            throw new Error("Expected an array of messages");
+          }
           setMessages(data);
         } catch (error) {
           console.error("Failed to fetch messages:", error);
         }
-      }
-    };
+      };
 
-    fetchMessages();
+      fetchMessages();
+    }
   }, [selectedThread]);
 
   const getUsernameById = (userId) => {
@@ -116,55 +130,64 @@ const Forum = () => {
     }
   };
 
-  const handleThreadDelete = async (threadId) => {
-    try {
-      const response = await fetch(`http://localhost:5555/threads/${threadId}`, {
-        method: "DELETE",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${localStorage.getItem("token")}`,
-        },
-      });
-  
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.error || "Failed to delete thread");
-      }
-  
-      setThreads(threads.filter((thread) => thread.id !== threadId));
-      setSelectedThread(null);
-      setMessages([]);
-      setContextMenuVisible(false);
-    } catch (error) {
-      console.error("Error:", error);
-    }
-  };
-  
-
+  // Handle message delete
   const handleMessageDelete = async (messageId) => {
     try {
-      // Make sure `selectedThreadId` is correctly set
-      const response = await fetch(`http://localhost:5555/threads/${selectedThreadId}/messages/${messageId}`, {
-        method: "DELETE",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${localStorage.getItem("token")}`,
-        },
-      });
-  
+      const response = await fetch(
+        `http://localhost:5555/threads/${selectedThread.id}/messages/${messageId}`,
+        {
+          method: "DELETE",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${localStorage.getItem("token")}`,
+          },
+        }
+      );
+
       if (!response.ok) {
         const errorData = await response.json();
         throw new Error(errorData.error || "Failed to delete message");
       }
-  
-      setMessages(messages.filter((message) => message.id !== messageId));
+
+      setMessages((prevMessages) =>
+        prevMessages.filter((message) => message.id !== messageId)
+      );
       setContextMenuVisible(false);
     } catch (error) {
       console.error("Error:", error);
     }
   };
-  
-  
+
+  // Handle thread delete
+  const handleThreadDelete = async (threadId) => {
+    try {
+      const response = await fetch(
+        `http://localhost:5555/threads/${threadId}`,
+        {
+          method: "DELETE",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${localStorage.getItem("token")}`,
+          },
+        }
+      );
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error || "Failed to delete thread");
+      }
+
+      setThreads((prevThreads) =>
+        prevThreads.filter((thread) => thread.id !== threadId)
+      );
+      if (selectedThread?.id === threadId) {
+        setSelectedThread(null);
+      }
+      setContextMenuVisible(false);
+    } catch (error) {
+      console.error("Error:", error);
+    }
+  };
 
   const handleCreateThread = async () => {
     if (newThreadTitle.trim()) {
@@ -187,35 +210,18 @@ const Forum = () => {
         }
 
         const data = await response.json();
-        setThreads([...threads, data]);
+        setThreads((prevThreads) => [...prevThreads, data]);
         setNewThreadTitle("");
+        setCreatingThread(false);
       } catch (error) {
         console.error("Error:", error);
       }
     }
   };
 
-  const handleSearch = (event) => {
-    setSearchTerm(event.target.value);
-  };
-
   const handleThreadSelect = (thread) => {
     setSelectedThread(thread);
-  };
-
-  const handleThreadClick = (thread) => {
-    if (thread.creator_id !== loggedInUserId) {
-      handleThreadSelect(thread);
-    }
-  };
-
-  const handleMessageClick = (message) => {
-    if (message.creator_id !== loggedInUserId) {
-      return;
-    }
-    setContextMenuPosition({ x: 0, y: 0 });
-    setItemToDelete({ item: message, type: 'messages' });
-    setContextMenuVisible(true);
+    setMessages([]); // Clear messages when a new thread is selected
   };
 
   const handleContextMenu = (event, item, type) => {
@@ -227,40 +233,16 @@ const Forum = () => {
 
   const handleDelete = async () => {
     if (!itemToDelete) return;
-  
+
     const { item, type } = itemToDelete;
-    try {
-      const response = await fetch(
-        `http://localhost:5555/${type}/${item.id}`,
-        {
-          method: "DELETE",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${localStorage.getItem("token")}`,
-          },
-          body: JSON.stringify({ id: item.id }), // Include the ID in the request body
-        }
-      );
-  
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.error || `Failed to delete ${type}`);
-      }
-  
-      if (type === 'threads') {
-        setThreads(threads.filter((thread) => thread.id !== item.id));
-        setSelectedThread(null);
-        setMessages([]);
-      } else if (type === 'messages') {
-        setMessages(messages.filter((message) => message.id !== item.id));
-      }
-  
-      setContextMenuVisible(false);
-    } catch (error) {
-      console.error("Error:", error);
+
+    if (type === "threads") {
+      await handleThreadDelete(item.id);
+    } else if (type === "messages") {
+      await handleMessageDelete(item.id);
     }
   };
-  
+
   const handleCancel = () => {
     setContextMenuVisible(false);
   };
@@ -275,76 +257,93 @@ const Forum = () => {
           className="search-bar"
           placeholder="Search..."
           value={searchTerm}
-          onChange={handleSearch}
+          onChange={(e) => setSearchTerm(e.target.value)}
         />
       </nav>
       <div className="main-content">
         <div className="sidebar">
           <h2>Threads</h2>
+          {creatingThread ? (
+            <div className="create-thread">
+              <input
+                type="text"
+                placeholder="Enter new thread title..."
+                value={newThreadTitle}
+                onChange={(e) => setNewThreadTitle(e.target.value)}
+              />
+              <button onClick={handleCreateThread}>Create</button>
+              <button onClick={() => setCreatingThread(false)}>Cancel</button>
+            </div>
+          ) : (
+            <button onClick={() => setCreatingThread(true)}>New Thread</button>
+          )}
           <ul>
             {threads
               .filter((thread) =>
-                thread.title.toLowerCase().includes(searchTerm.toLowerCase())
+                (thread.title || "")
+                  .toLowerCase()
+                  .includes(searchTerm.toLowerCase())
               )
               .map((thread) => (
                 <li
                   key={thread.id}
-                  onClick={() => handleThreadClick(thread)}
-                  onContextMenu={(event) =>
-                    handleContextMenu(event, thread, 'threads')
+                  onClick={() => handleThreadSelect(thread)}
+                  onContextMenu={(e) =>
+                    handleContextMenu(e, thread, "threads")
+                  }
+                  className={
+                    selectedThread && selectedThread.id === thread.id
+                      ? "selected"
+                      : ""
                   }
                 >
                   {thread.title}
                 </li>
               ))}
           </ul>
-          <input
-            type="text"
-            value={newThreadTitle}
-            onChange={(e) => setNewThreadTitle(e.target.value)}
-            placeholder="New thread title"
-          />
-          <button onClick={handleCreateThread}>Create Thread</button>
         </div>
-        <div className="chat-window">
-          <div className="chat-header">
-            {selectedThread ? selectedThread.title : "Select a thread"}
-          </div>
-          <div className="messages">
-            {messages.map((message) => (
-              <div
-                key={message.id}
-                className="message"
-                onContextMenu={(event) =>
-                  handleContextMenu(event, message, 'messages')
-                }
-              >
-                <strong>{getUsernameById(message.creator_id)}</strong>: {message.text}
-              </div>
-            ))}
-          </div>
-          {selectedThread && (
+        {selectedThread ? (
+          <div className="chat-window">
+            <div className="chat-header">{selectedThread.title}</div>
+            <div className="messages">
+              {messages.map((message) => (
+                <div
+                  key={message.id}
+                  className="message"
+                  onContextMenu={(e) =>
+                    handleContextMenu(e, message, "messages")
+                  }
+                >
+                  <strong>{getUsernameById(message.creator_id)}:</strong>{" "}
+                  {message.text}
+                </div>
+              ))}
+            </div>
             <div className="message-input">
               <input
                 type="text"
+                placeholder="Type a message..."
                 value={newMessage}
                 onChange={(e) => setNewMessage(e.target.value)}
-                placeholder="Type your message"
               />
               <button onClick={handleSend}>Send</button>
             </div>
-          )}
-        </div>
+          </div>
+        ) : (
+          <div className="no-thread-selected">Select a thread to view messages</div>
+        )}
       </div>
+
       {contextMenuVisible && (
         <div
           className="context-menu"
-          style={{ top: contextMenuPosition.y, left: contextMenuPosition.x }}
+          style={{
+            top: contextMenuPosition.y,
+            left: contextMenuPosition.x,
+          }}
         >
-          <ul>
-            <li onClick={handleDelete}>Delete {itemToDelete?.type.slice(0, -1)}</li>
-            <li onClick={handleCancel}>Cancel</li>
-          </ul>
+          <button onClick={handleDelete}>Delete</button>
+          <button onClick={handleCancel}>Cancel</button>
         </div>
       )}
     </div>

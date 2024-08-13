@@ -1,29 +1,13 @@
-html,
-body {
-  height: 100%;
-  width: 100%;
-  margin: 0;
-  padding: 0;
-  font-family: "Arial", sans-serif;
-  background: linear-gradient(to bottom, #4e958b, #192f2c);
-  
-}
 
-#root {
-  height: 100%;
-}
 
 .report-section {
   display: flex;
   flex-direction: row;
   justify-content: center;
   align-items: center;
-
   min-height: auto;
-
-  padding: 20px;
   box-sizing: border-box;
-  overflow: hidden;
+  overflow-x: hidden;
 }
 
 .report-container {

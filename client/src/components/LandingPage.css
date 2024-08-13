@@ -1,4 +1,4 @@
-body, html {
+/* body, html {
     height: 100%;
     margin: 0;
     font-family: Arial, sans-serif;
@@ -14,7 +14,7 @@ body, html {
     position: relative; 
     width: 100%;
     
-}
+} */
 
 .landing-section {
     background-size: cover;

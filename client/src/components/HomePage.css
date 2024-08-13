@@ -1,7 +1,4 @@
-html, body {
-  height: 100%;
-  margin: 0;
-}
+
 
 .homepage {
   background: linear-gradient(to bottom, #4E958B, #192F2C);
@@ -67,6 +64,7 @@ html, body {
 }
 
 .bottom-frame {
+  text-align: center;
   width: 212px;
   height: 376px;
   background: linear-gradient(to bottom, #4E958B, #192F2C);
@@ -75,12 +73,14 @@ html, body {
 }
 
 .bottom-frame-icon {
+  text-align: center;
   margin-top: 15px;
   font-size: 48px;
   margin-bottom: 20px;
 }
 
 .bottom-frame-title {
+  text-align: center;
   font-size: 24px;
   font-weight: bold;
   margin-bottom: 10px;

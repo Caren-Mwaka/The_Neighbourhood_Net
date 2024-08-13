@@ -6,7 +6,7 @@ from flask_bcrypt import Bcrypt
 from flask_jwt_extended import JWTManager, create_access_token, jwt_required, get_jwt_identity
 from flask_restful import Api, Resource
 from werkzeug.exceptions import NotFound
-from datetime import datetime
+from datetime import datetime, timedelta
 
 
 app = Flask(__name__)
@@ -15,6 +15,9 @@ app.config['SECRET_KEY'] = 'your-unique-secret-key'
 app.config['JWT_SECRET_KEY'] = 'super-secret-key'
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///app.db'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+
+# Set JWT token expiration time to 7 days
+app.config['JWT_ACCESS_TOKEN_EXPIRES'] = timedelta(days=7)
 
 db.init_app(app)
 bcrypt = Bcrypt(app)
@@ -400,28 +403,24 @@ class ThreadListResource(Resource):
         threads = ForumThread.query.all()
         return jsonify([{
             'id': thread.id,
-            'title': thread.title,
+            'title': thread.title or 'Untitled Thread',  # Default title if missing
             'creator_id': thread.creator_id,
             'created_at': thread.created_at
         } for thread in threads])
 
     def post(self):
         data = request.json
+        title = data.get('title', 'Untitled Thread')  # Default to 'Untitled Thread' if title is missing
         thread = ForumThread(
-            title=data['title'],
+            title=title,
             creator_id=data['creator_id']
         )
         db.session.add(thread)
         db.session.commit()
-        return jsonify({'id': thread.id})
+        return jsonify({'id': thread.id, 'title': thread.title})
 
-    def delete(self):
-        data = request.json
-        thread_id = data.get('id')
 
-        if not thread_id:
-            return {'error': 'Thread ID is required'}, 400
-
+    def delete(self, thread_id):  # Accept thread_id as a URL parameter
         thread = ForumThread.query.get(thread_id)
 
         if not thread:
@@ -476,12 +475,6 @@ class MessageListResource(Resource):
         })
 
     def delete(self, thread_id, message_id):
-        data = request.json
-        message_id = data.get('id')
-
-        if not message_id:
-            return {'error': 'Message ID is required'}, 400
-
         message = ForumMessage.query.filter_by(id=message_id, thread_id=thread_id).first()
 
         if not message:
@@ -490,6 +483,7 @@ class MessageListResource(Resource):
         db.session.delete(message)
         db.session.commit()
         return {'message': 'Message deleted successfully'}
+
     
 api.add_resource(Index, '/')
 api.add_resource(UserResource, '/users', '/users/<int:user_id>')
@@ -499,8 +493,8 @@ api.add_resource(EventResource, '/events', '/events/<int:event_id>')
 api.add_resource(RSVPResource, '/rsvp', '/rsvp/<int:rsvp_id>')
 api.add_resource(IncidentResource, '/incidents', '/incidents/<int:incident_id>')
 api.add_resource(NotificationResource, '/notifications', '/notifications/<int:notification_id>')
-api.add_resource(ThreadListResource, '/threads')
-api.add_resource(MessageListResource, '/threads/<int:thread_id>/messages')
+api.add_resource(ThreadListResource, '/threads', '/threads/<int:thread_id>' )
+api.add_resource(MessageListResource,'/threads/<int:thread_id>/messages', '/threads/<int:thread_id>/messages/<int:message_id>')
 
 if __name__ == '__main__':
    app.run(port=5555, debug=True)
