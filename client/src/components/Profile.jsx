@@ -13,6 +13,7 @@ const Profile = () => {
 
   const [avatar, setAvatar] = useState(null);
   const [showPassword, setShowPassword] = useState(false);
+  const [isUploading, setIsUploading] = useState(false);
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -22,15 +23,52 @@ const Profile = () => {
     }));
   };
 
+  const handleImageUpload = async (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      setIsUploading(true); // Start upload indicator
+      const imageData = new FormData();
+      imageData.append("file", file);
+      imageData.append("upload_preset", "zjphv40j"); // Replace with your actual preset
+
+      try {
+        const response = await fetch(
+          "https://api.cloudinary.com/v1_1/djlpav9jq/image/upload", // Cloudinary cloud name
+          {
+            method: "POST",
+            body: imageData,
+          }
+        );
+
+        if (!response.ok) {
+          throw new Error("Failed to upload image");
+        }
+
+        const data = await response.json();
+        setAvatar(data.secure_url); // Store the uploaded image URL
+      } catch (error) {
+        console.error("Error uploading image:", error);
+      } finally {
+        setIsUploading(false); // End upload indicator
+      }
+    }
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
+
+    if (isUploading) {
+      alert("Please wait until the image upload is complete.");
+      return;
+    }
+
     try {
       const response = await fetch("/api/profile", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify(formData),
+        body: JSON.stringify({ ...formData, avatar }), // Include avatar URL in the form data
       });
 
       if (!response.ok) {
@@ -44,45 +82,15 @@ const Profile = () => {
     }
   };
 
-  const handleImageUpload = async (e) => {
-    const file = e.target.files[0];
-    if (file) {
-      const formData = new FormData();
-      formData.append("file", file);
-      formData.append("upload_preset", "zjphv40j"); // Replace with your actual preset
-
-      try {
-        const response = await fetch(
-          "https://api.cloudinary.com/v1_1/djlpav9jq/image/upload", // Cloudinary cloud name
-          {
-            method: "POST",
-            body: formData,
-          }
-        );
-
-        if (!response.ok) {
-          throw new Error("Failed to upload image");
-        }
-
-        const data = await response.json();
-        setAvatar(data.secure_url); // Store the uploaded image URL
-
-        // Optional: Save the avatar URL to the backend
-      } catch (error) {
-        console.error("Error uploading image:", error);
-      }
-    }
-  };
-
   const handleLogout = () => {
     console.log("Logout clicked");
+    // Add logout logic here
   };
 
   useEffect(() => {
     const fetchProfile = async () => {
-      const username = formData.username;
       try {
-        const response = await fetch(`/api/profile?username=${username}`);
+        const response = await fetch(`/api/profile`);
         if (!response.ok) {
           throw new Error("Failed to fetch profile");
         }
@@ -202,8 +210,12 @@ const Profile = () => {
                 {showPassword ? <Visibility /> : <VisibilityOff />}
               </button>
             </div>
-            <button type="submit" className={styles.updateButton}>
-              Update Information
+            <button
+              type="submit"
+              className={styles.updateButton}
+              disabled={isUploading}
+            >
+              {isUploading ? "Uploading..." : "Update Information"}
             </button>
           </form>
         </div>
