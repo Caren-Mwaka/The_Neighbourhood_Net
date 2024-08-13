@@ -1,4 +1,5 @@
 import React from 'react';
+import { useNavigate } from 'react-router-dom';
 import { FaFacebook, FaTwitter, FaInstagram } from 'react-icons/fa';
 import './About.css';
 
@@ -6,10 +7,12 @@ import teamPhoto from '../assets/teamphoto1.jpg';
 import netlogo from '../assets/neighbourhood-net-logo.png'; 
 
 const About = () => {
+  const navigate = useNavigate();
+
   return (
-    <div className="container">
+    <div className="about-container">
       <div className="content">
-        <img src={netlogo} alt="Logo" className="aboutlogo" /> 
+        <img src={netlogo} alt="Logo" className="aboutlogo" />
         <div className="description">
           <p>
             The Neighbourhood Net is a community watch application designed to empower our tight-knit community. It provides a platform to:
@@ -39,6 +42,9 @@ const About = () => {
         </div>
       </div>
       <div className="image-container">
+        <button className="go-back-button" onClick={() => navigate('/home')}>
+          Go Back
+        </button>
         <img
           src={teamPhoto}
           alt="Neighborhood view"

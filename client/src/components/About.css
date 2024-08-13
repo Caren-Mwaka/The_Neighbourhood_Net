@@ -1,91 +1,110 @@
+@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@400;700&display=swap');
 
-.container {
-    display: flex;
-    flex-direction: row;
-    width: 100vw !important;
-    min-height: 100vh;
-    background-color: #45847b;
-    background: linear-gradient(to bottom, #45847b, #192F2C);
-    margin: 0 !important;
-    padding: 0 !important;
-    overflow: hidden;
-}
-
-.content {
-    flex: 1;
-    padding: 40px;
-    display: flex;
-    flex-direction: column;
-    justify-content: flex-start;
-    overflow-y: auto; 
-}
-
-.description {
-    color: #ffffff;
-    font-size: 1.2em;
-    margin-bottom: 20px; 
-    font-family: 'Outfit', sans-serif;
-    text-align: left;
-}
-
-.social-icons {
-    margin-top: 20px;
-    display: flex;
-    flex-direction: column; 
-    gap: 10px;
-}
-
-.social-link {
-    color: white;
-    text-decoration: none;
-    display: flex;
-    align-items: center;
-    gap: 5px;
-    font-family: 'Outfit', sans-serif;
+.about-container {
+  display: flex;
+  width: 100vw !important;
+  height: 100vh;
+  box-sizing: border-box;
+  padding: 0 !important;
+  margin: 0 !important;
+  background: linear-gradient(to bottom, #4E958B, #192F2C);
 }
 
 .image-container {
-    position: relative;
-    width: 50%; 
-    max-width: 600px; 
-    height: 90vh; 
-    margin: 20px;
-    margin-top: 40px;
-    flex-shrink: 0; 
-    border-radius: 20px;
-    overflow: hidden; 
+  flex: 1;
+  max-width: 50%;
+  padding: 0;
+  box-sizing: border-box;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .neighborhood-image {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
+  width: calc(100% - 20px);
+  height: 80%;
+  object-fit: cover;
+  border-radius: 8px;
+}
+
+.content {
+  flex: 1;
+  max-width: 50%;
+  padding: 20px;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
 }
 
 .aboutlogo {
-    width: 200px; 
-    height: auto; 
-    margin-bottom: 10px; 
-    display: block; 
-    margin-left: 0;
-    padding: 10px; 
-    background: linear-gradient(135deg, #45847b, #192F2C); 
-    border-radius: 15px; 
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
-    display: flex; 
-    justify-content: center; 
-    align-items: left; 
+  display: block;
+  margin: 20px 0;
+  width: 150px;
+  height: auto;
+  background: linear-gradient(to bottom, #4E958B, #192F2C);
+  padding: 10px;
+  border-radius: 8px;
+  align-self: flex-start;
 }
 
-ul {
-    margin: 0;
-    padding-left: 0; 
-    list-style-type: disc; 
-    text-align: left;
+body {
+  font-family: 'Outfit', sans-serif;
 }
 
-li {
+.description {
+  color: white;
+  font-size: 1em;
+  line-height: 1.5em;
+  background-color: transparent;
+}
+
+.description p,
+.description ul,
+.description li {
+  color: white !important;
+  font-size: 1em;
+  font-family: 'Outfit', sans-serif;
+}
+
+.description ul {
+  margin: 10px 0;
+  padding-left: 20px;
+}
+
+.description li {
+  margin-bottom: 10px;
+}
+
+.social-icons {
+  margin-top: 20px;
+}
+
+.social-link {
+  display: flex;
+  align-items: center;
+  margin: 10px 0;
+  color: white;
+  text-decoration: none;
+}
+
+.social-link svg {
+  margin-right: 10px;
+}
+
+.go-back-button {
+    background: linear-gradient(to bottom, #4E958B, #192F2C);
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    font-size: 1em;
+    border-radius: 8px;
+    cursor: pointer;
     margin-bottom: 20px; 
-    margin-top: 10px;
-    color: #ffffff; 
-}
+    align-self: flex-start; 
+  }
+  
+  .go-back-button:hover {
+    background: linear-gradient(to bottom, #192F2C, #4E958B);
+  }
+  
