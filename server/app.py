@@ -490,6 +490,46 @@ class MessageListResource(Resource):
         db.session.delete(message)
         db.session.commit()
         return {'message': 'Message deleted successfully'}
+
+# Fetch user profile
+@app.route('/api/profile', methods=['GET'])
+def get_profile():
+    user_id = request.args.get('user_id')
+    if not user_id:
+        return jsonify({"error": "User ID is required"}), 400
+
+    user = User.query.get(user_id)
+    if user is None:
+        return jsonify({"error": "User not found"}), 404
+
+    return jsonify(user.to_dict())
+
+# Update user profile
+@app.route('/api/profile', methods=['POST'])
+def update_profile():
+    data = request.json
+    user_id = data.get('user_id')
+
+    if not user_id:
+        return jsonify({"error": "User ID is required"}), 400
+
+    user = User.query.get(user_id)
+    if user is None:
+        return jsonify({"error": "User not found"}), 404
+
+    user.username = data.get('username', user.username)
+    user.email = data.get('email', user.email)
+    user.contact_number = data.get('contactNumber', user.contact_number)
+    user.address = data.get('address', user.address)
+    user.avatar = data.get('avatar', user.avatar)
+
+    # Only update the password if a new one is provided
+    if data.get('password'):
+        user.password = data['password']
+
+    db.session.commit()
+    return jsonify({"message": "Profile updated successfully", "user": user.to_dict()})
+
     
 api.add_resource(Index, '/')
 api.add_resource(UserResource, '/users', '/users/<int:user_id>')
