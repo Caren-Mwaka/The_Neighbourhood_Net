@@ -157,4 +157,27 @@
     cursor: pointer;
     margin-right: 10px;
   }
-  
+  /* Existing CSS styles */
+
+.context-menu {
+  position: absolute;
+  background: white;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
+  z-index: 1000;
+}
+
+.context-menu button {
+  display: block;
+  width: 100%;
+  padding: 10px;
+  border: none;
+  background: #f5f5f5;
+  cursor: pointer;
+  text-align: left;
+}
+
+.context-menu button:hover {
+  background: #e0e0e0;
+}

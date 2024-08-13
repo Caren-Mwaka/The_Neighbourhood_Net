@@ -420,17 +420,22 @@ class ThreadListResource(Resource):
         return jsonify({'id': thread.id, 'title': thread.title})
 
 
-    def delete(self, thread_id):  # Accept thread_id as a URL parameter
+    def delete(self, thread_id):
         thread = ForumThread.query.get(thread_id)
 
         if not thread:
             return {'error': 'Thread not found'}, 404
 
-        db.session.delete(thread)
-        db.session.commit()
-        return {'message': 'Thread deleted successfully'}
-
-
+        try:
+            # Delete associated messages
+            ForumMessage.query.filter_by(thread_id=thread_id).delete()
+            db.session.delete(thread)
+            db.session.commit()
+            return {'message': 'Thread deleted successfully'}
+        except Exception as e:
+            db.session.rollback()
+            return {'error': str(e)}, 500
+        
 class MessageListResource(Resource):
     def get(self, thread_id):
         messages = ForumMessage.query.filter_by(thread_id=thread_id).all()
