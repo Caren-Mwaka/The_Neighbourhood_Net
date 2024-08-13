@@ -28,9 +28,9 @@ const About = () => {
             <FaInstagram size={32} color="white" />
             theneighbourhoodnet
           </a>
-          <a href="https://twitter.com/theneighbourhoodnet" className="social-link">
+          <a href="https://twitter.com/neighborhoodn3t" className="social-link">
             <FaTwitter size={32} color="white" />
-            theneighbourhoodnet
+            neighborhoodn3t
           </a>
           <a href="https://facebook.com/theneighbourhoodnet" className="social-link">
             <FaFacebook size={32} color="white" />
