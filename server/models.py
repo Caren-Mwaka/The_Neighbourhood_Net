@@ -12,8 +12,11 @@ class User(db.Model):
     name = db.Column(db.String(255), nullable=False) 
     username = db.Column(db.String(80), nullable=False, unique=True)
     email = db.Column(db.String(120), nullable=False, unique=True)
+    contact_number = db.Column(db.String(20), nullable=True)
+    address = db.Column(db.String(255), nullable=True)  
+    avatar = db.Column(db.String(255), nullable=True)  
     password = db.Column(db.String(255), nullable=False)
-    role = db.Column(db.String(20), nullable=False, default='user') 
+    role = db.Column(db.String(20), nullable=False, default='user')
     created_at = db.Column(db.DateTime, nullable=False, default=db.func.current_timestamp())
 
     rsvps = db.relationship('RSVP', back_populates='user', cascade='all, delete-orphan', overlaps='events')
@@ -46,7 +49,8 @@ class User(db.Model):
             "name": self.name,
             "username": self.username,
             "email": self.email,
-            "role": self.role, 
+            "contact_number": self.contact_number,  
+            "address": self.address,
             "created_at": self.created_at.isoformat(),
             "events": [event.id for event in self.events]
         }
