@@ -35,13 +35,13 @@ const Event = ({ event, onRSVP }) => {
 
 const EventHeader = () => {
   return (
-    <header className="header">
+    <div className="header">
       <img src={headerimage} alt="Events Header" className="header-image" />
       <div className="header-text">
-        <h1>Stay Connected</h1>
-        <h1>Join Upcoming Events</h1>
+        <h1>"Stay Connected"</h1>
+        <h1>"Join Upcoming Events"</h1>
       </div>
-    </header>
+    </div>
   );
 };
 
@@ -114,16 +114,15 @@ const EventsList = () => {
 
   const paginate = (pageNumber) => setCurrentPage(pageNumber);
 
-  const pageNumbers = [];
-  for (let i = 1; i <= Math.ceil(events.length / eventsPerPage); i++) {
-    pageNumbers.push(i);
-  }
+  const totalPages = Math.ceil(events.length / eventsPerPage);
 
   return (
-    <div className="container">
-      <EventHeader />
-      <div className="events-content">
-        <select value={category} onChange={(e) => setCategory(e.target.value)} className="category-filter">
+    <div className="events-container">
+      <div className="header-container">
+        <EventHeader />
+      </div>
+      <div className="eventslist-container">
+        <select className="category-filter" onChange={(e) => setCategory(e.target.value)}>
           <option value="all">All Events</option>
           <option value="sports">Sports</option>
           <option value="music">Music</option>
@@ -136,17 +135,17 @@ const EventsList = () => {
           <option value="environment">Environment</option>
           <option value="religious">Religious</option>
         </select>
-        {loading && <p>Loading events...</p>}
-        {error && <p>{error}</p>}
-        <div className="events-list">
-          {currentEvents.map((event) => (
-            <Event key={event.id} event={event} onRSVP={handleRSVP} />
-          ))}
-        </div>
+        {loading ? <p>Loading...</p> : error ? <p>{error}</p> : currentEvents.map((event) => (
+          <Event key={event.id} event={event} onRSVP={handleRSVP} />
+        ))}
         <div className="pagination">
-          {pageNumbers.map(number => (
-            <button key={number} onClick={() => paginate(number)} className={number === currentPage ? 'active' : ''}>
-              {number}
+          {Array.from({ length: totalPages }, (_, i) => (
+            <button
+              key={i + 1}
+              onClick={() => paginate(i + 1)}
+              className={i + 1 === currentPage ? 'active' : ''}
+            >
+              {i + 1}
             </button>
           ))}
         </div>
