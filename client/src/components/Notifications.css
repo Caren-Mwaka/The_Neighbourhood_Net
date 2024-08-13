@@ -1,4 +1,4 @@
-.card-container {
+.notcard-container {
   background-color: #ffffff;
   border: 1px solid #e0e0e0;
   border-radius: 8px;
@@ -24,7 +24,7 @@
   }
 }
 
-.card-container:before {
+.notcard-container:before {
   content: "";
   position: absolute;
   top: 0;
@@ -38,16 +38,16 @@
   z-index: 1;
 }
 
-.card-container:hover:before {
+.notcard-container:hover:before {
   border-color: #449278;
 }
 
-.card-container:hover {
+.notcard-container:hover {
   transform: translateY(-5px);
   box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
 }
 
-.card-container:hover .title {
+.notcard-container:hover .title {
   color: #449278;
 }
 
@@ -88,7 +88,7 @@
   padding: 16px;
 }
 
-.card-content {
+.notcard-content {
   margin-bottom: 16px;
 }
 

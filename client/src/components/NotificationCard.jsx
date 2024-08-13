@@ -3,8 +3,8 @@ import './Notifications.css';
 
 const NotificationCard = ({ title, message, date, onDismiss }) => {
   return (
-    <div className="card-container">
-      <div className="card-content">
+    <div className="notcard-container">
+      <div className="notcard-content">
         <h3 className="title">{title}</h3>
         <p className="message">{message}</p>
         <p className="date">{new Date(date).toLocaleDateString()}</p>
