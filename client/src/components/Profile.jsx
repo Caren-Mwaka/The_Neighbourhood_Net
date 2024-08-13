@@ -26,14 +26,14 @@ const Profile = () => {
   const handleImageUpload = async (e) => {
     const file = e.target.files[0];
     if (file) {
-      setIsUploading(true); // Start upload indicator
+      setIsUploading(true);
       const imageData = new FormData();
       imageData.append("file", file);
-      imageData.append("upload_preset", "zjphv40j"); // Replace with your actual preset
+      imageData.append("upload_preset", "zjphv40j");
 
       try {
         const response = await fetch(
-          "https://api.cloudinary.com/v1_1/djlpav9jq/image/upload", // Cloudinary cloud name
+          "https://api.cloudinary.com/v1_1/djlpav9jq/image/upload",
           {
             method: "POST",
             body: imageData,
@@ -45,11 +45,11 @@ const Profile = () => {
         }
 
         const data = await response.json();
-        setAvatar(data.secure_url); // Store the uploaded image URL
+        setAvatar(data.secure_url);
       } catch (error) {
         console.error("Error uploading image:", error);
       } finally {
-        setIsUploading(false); // End upload indicator
+        setIsUploading(false);
       }
     }
   };
@@ -68,7 +68,7 @@ const Profile = () => {
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ ...formData, avatar }), // Include avatar URL in the form data
+        body: JSON.stringify({ ...formData, avatar }),
       });
 
       if (!response.ok) {
@@ -84,7 +84,6 @@ const Profile = () => {
 
   const handleLogout = () => {
     console.log("Logout clicked");
-    // Add logout logic here
   };
 
   useEffect(() => {
@@ -117,7 +116,7 @@ const Profile = () => {
             <img
               src={
                 avatar ||
-                "https://res.cloudinary.com/djlpav9jq/image/upload/images_2_hvixf8" // Default avatar image
+                "https://res.cloudinary.com/djlpav9jq/image/upload/images_2_hvixf8"
               }
               className={styles.profileImage}
               alt="User profile"
@@ -141,7 +140,7 @@ const Profile = () => {
           <form className={styles.mainContent} onSubmit={handleSubmit}>
             <div className={styles.headerWrapper}>
               <img
-                src="https://cdn.builder.io/api/v1/image/assets/TEMP/3ca809c633e39eabf604c499dde220cebfbfd013719a5287b08a4218f250461d?placeholderIfAbsent=true&apiKey=d975cdd6201143ddb3c9da5092c113ba" // Replace with your website logo URL
+                src="https://cdn.builder.io/api/v1/image/assets/TEMP/3ca809c633e39eabf604c499dde220cebfbfd013719a5287b08a4218f250461d?placeholderIfAbsent=true&apiKey=d975cdd6201143ddb3c9da5092c113ba"
                 className={styles.headerImage}
                 alt="Website Logo"
               />
