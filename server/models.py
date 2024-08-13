@@ -57,7 +57,7 @@ class ForumThread(db.Model):
     creator_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
     creator = db.relationship('User', backref=db.backref('threads', lazy=True))
-    messages = db.relationship('ForumMessage', backref='thread', lazy=True)
+    messages = db.relationship('ForumMessage', backref='thread', cascade="all, delete-orphan")
 
 class ForumMessage(db.Model):
     id = db.Column(db.Integer, primary_key=True)

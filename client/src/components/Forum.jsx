@@ -90,6 +90,8 @@ const Forum = () => {
       };
 
       fetchMessages();
+    } else {
+      setMessages([]); // Clear messages if no thread is selected
     }
   }, [selectedThread]);
 
@@ -130,7 +132,6 @@ const Forum = () => {
     }
   };
 
-  // Handle message delete
   const handleMessageDelete = async (messageId) => {
     try {
       const response = await fetch(
@@ -158,36 +159,7 @@ const Forum = () => {
     }
   };
 
-  // Handle thread delete
-  const handleThreadDelete = async (threadId) => {
-    try {
-      const response = await fetch(
-        `http://localhost:5555/threads/${threadId}`,
-        {
-          method: "DELETE",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${localStorage.getItem("token")}`,
-          },
-        }
-      );
-
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.error || "Failed to delete thread");
-      }
-
-      setThreads((prevThreads) =>
-        prevThreads.filter((thread) => thread.id !== threadId)
-      );
-      if (selectedThread?.id === threadId) {
-        setSelectedThread(null);
-      }
-      setContextMenuVisible(false);
-    } catch (error) {
-      console.error("Error:", error);
-    }
-  };
+  // Removed handleThreadDelete function
 
   const handleCreateThread = async () => {
     if (newThreadTitle.trim()) {
@@ -226,6 +198,13 @@ const Forum = () => {
 
   const handleContextMenu = (event, item, type) => {
     event.preventDefault();
+
+    // Show context menu only for messages
+    if (type === "threads") return;
+
+    // Check if the logged-in user is the creator
+    if (type === "messages" && item.creator_id !== loggedInUserId) return;
+
     setContextMenuPosition({ x: event.clientX, y: event.clientY });
     setItemToDelete({ item, type });
     setContextMenuVisible(true);
@@ -236,11 +215,12 @@ const Forum = () => {
 
     const { item, type } = itemToDelete;
 
-    if (type === "threads") {
-      await handleThreadDelete(item.id);
-    } else if (type === "messages") {
+    if (type === "messages") {
       await handleMessageDelete(item.id);
     }
+
+    // Hide context menu after deletion
+    setContextMenuVisible(false);
   };
 
   const handleCancel = () => {
@@ -275,14 +255,17 @@ const Forum = () => {
               <button onClick={() => setCreatingThread(false)}>Cancel</button>
             </div>
           ) : (
-            <button onClick={() => setCreatingThread(true)}>New Thread</button>
+            <button
+              className="notifications"
+              onClick={() => setCreatingThread(true)}
+            >
+              + New Thread
+            </button>
           )}
           <ul>
             {threads
               .filter((thread) =>
-                (thread.title || "")
-                  .toLowerCase()
-                  .includes(searchTerm.toLowerCase())
+                thread.title.toLowerCase().includes(searchTerm.toLowerCase())
               )
               .map((thread) => (
                 <li
@@ -290,11 +273,6 @@ const Forum = () => {
                   onClick={() => handleThreadSelect(thread)}
                   onContextMenu={(e) =>
                     handleContextMenu(e, thread, "threads")
-                  }
-                  className={
-                    selectedThread && selectedThread.id === thread.id
-                      ? "selected"
-                      : ""
                   }
                 >
                   {thread.title}
@@ -314,15 +292,17 @@ const Forum = () => {
                     handleContextMenu(e, message, "messages")
                   }
                 >
-                  <strong>{getUsernameById(message.creator_id)}:</strong>{" "}
-                  {message.text}
+                  <div className="message-author">
+                    {getUsernameById(message.creator_id)}:
+                  </div>
+                  <div className="message-text">{message.text}</div>
                 </div>
               ))}
             </div>
             <div className="message-input">
               <input
                 type="text"
-                placeholder="Type a message..."
+                placeholder="Type your message..."
                 value={newMessage}
                 onChange={(e) => setNewMessage(e.target.value)}
               />
@@ -330,10 +310,11 @@ const Forum = () => {
             </div>
           </div>
         ) : (
-          <div className="no-thread-selected">Select a thread to view messages</div>
+          <div className="chat-window">
+            <div className="chat-header">Select a thread to start chatting</div>
+          </div>
         )}
       </div>
-
       {contextMenuVisible && (
         <div
           className="context-menu"
