@@ -6,7 +6,7 @@ from datetime import datetime, time
 
 db = SQLAlchemy()
 
-# Existing User model with new relationships for threads and messages
+
 class User(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(255), nullable=False) 
@@ -67,7 +67,7 @@ class ForumMessage(db.Model):
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
     creator = db.relationship('User', backref=db.backref('messages', lazy=True))
     
-# Other models (Event, RSVP, Incident, Notification) remain unchanged
+
 class Event(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(100), nullable=False)
@@ -156,4 +156,20 @@ class Notification(db.Model):
             "message": self.message,
             "date": self.date.isoformat(),
             "dismissed": self.dismissed
+        }
+
+class ContactMessage(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    full_name = db.Column(db.String(100), nullable=False)
+    email = db.Column(db.String(120), nullable=False)
+    message = db.Column(db.Text, nullable=False)
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+
+    def to_dict(self):
+        return {
+            'id': self.id,
+            'full_name': self.full_name,
+            'email': self.email,
+            'message': self.message,
+            'created_at': self.created_at.isoformat(),
         }

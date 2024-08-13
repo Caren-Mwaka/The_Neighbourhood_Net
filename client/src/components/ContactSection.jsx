@@ -1,12 +1,14 @@
 import React from 'react';
-import logo from '../assets/neighbourhood-net-logo.png'; // Adjust the path as necessary
+import logo from '../assets/neighbourhood-net-logo.png';
 import TelegramIcon from '@mui/icons-material/Telegram';
 import ArrowForwardIcon from '@mui/icons-material/ArrowForward';
 import PhoneIcon from '@mui/icons-material/Phone';
 import EmailIcon from '@mui/icons-material/Email';
-import { Box, TextField, Button, Typography } from '@mui/material';
+import { TextField, Button, Typography } from '@mui/material';
 import { useFormik } from 'formik';
 import * as yup from 'yup';
+import { toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 import './ContactSection.css';
 
 const validationSchema = yup.object({
@@ -23,8 +25,33 @@ const ContactSection = () => {
       message: '',
     },
     validationSchema: validationSchema,
-    onSubmit: (values) => {
-      alert(JSON.stringify(values, null, 2));
+    onSubmit: (values, { resetForm }) => {
+      fetch('http://localhost:5555/contact-messages', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          full_name: values.fullName,  
+          email: values.email,
+          message: values.message,
+        }),
+      })
+        .then((response) => {
+          if (!response.ok) {
+            throw new Error('Network response was not ok');
+          }
+          return response.json();
+        })
+        .then((data) => {
+          console.log('Success:', data);
+          toast.success('Message sent successfully!'); 
+          resetForm(); 
+        })
+        .catch((error) => {
+          console.error('Error:', error);
+          toast.error('Failed to send message. Please try again.'); 
+        });
     },
   });
 

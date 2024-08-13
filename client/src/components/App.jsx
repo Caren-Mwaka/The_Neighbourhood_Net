@@ -91,7 +91,7 @@ const router = createBrowserRouter([
     ),
   },
   {
-    path: "/contact", // Add the route for the contact section
+    path: "/contact", 
     element: <ContactSection />, 
   },
 ]);
