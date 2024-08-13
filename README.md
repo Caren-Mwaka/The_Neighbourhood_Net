@@ -1,6 +1,6 @@
 ## The Neighbourhood Net
 
-A Local Community Watch for Safety, Engagement, and Events
+The Neighbourhood Net is a comprehensive platform designed to strengthen community bonds by focusing on safety, engagement, and event organization. It empowers neighborhoods to monitor their surroundings, report incidents, and stay informed about local happenings. The platform also facilitates the creation and management of community events, fostering a sense of togetherness and active participation.
 
 ## Description
 
@@ -160,3 +160,11 @@ console
     team.py: Module handling team-related logic (if applicable to the project).
     debug.py: Utilities for debugging and testing.
     helpers.py: Helper functions used across the application.
+
+## GitHub repository
+    https://github.com/Caren-Mwaka/The_Neighbourhood_Net
+
+
+
+
+    
