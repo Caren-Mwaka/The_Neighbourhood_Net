@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import "./Forum.css";
 import logoImage from "../assets/neighbourhood-net-logo.png";
 import EmojiPicker from "emoji-picker-react";
-import { toast } from "react-toastify"; // Import toast for notifications
+import { toast } from "react-toastify"; 
 
 const Forum = () => {
   const [users, setUsers] = useState([]);
