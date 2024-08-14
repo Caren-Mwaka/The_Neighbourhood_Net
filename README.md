@@ -133,23 +133,24 @@ The Neighbourhood Net empowers communities by fostering collaboration, safety, a
 The project structure is organized as follows:
 
 console
-
 .
+├── LICENSE
+├── README.md
 ├── Pipfile
 ├── Pipfile.lock
-├── README.md
-└── lib
-    ├── models
-    │   ├── __init__.py
-    │   └── __pycache__/
-    ├── cli.py
-    ├── base.py
-    ├── main.py
-    ├── player.py
-    ├── team.py
-    ├── debug.py
-    └── helpers.py
+├── client/
+└── server/
+    ├── instance/
+    ├── migrations/
+    ├── app.py
+    ├── models.py
+    ├── seed.py
+    ├── Pipfile
+    └── Pipfile.lock
 
+
+
+    
 ##  Directory Explanation:
 
     lib/models/: Contains database models for the application.
