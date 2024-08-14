@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom"; 
 import "./Forum.css";
 import logoImage from "../assets/neighbourhood-net-logo.png";
+import EmojiPicker from "emoji-picker-react";
 
 const Forum = () => {
   const [users, setUsers] = useState([]);
@@ -18,6 +20,9 @@ const Forum = () => {
   });
   const [itemToDelete, setItemToDelete] = useState(null);
   const [creatingThread, setCreatingThread] = useState(false);
+  const [emojiPickerVisible, setEmojiPickerVisible] = useState(false);
+
+  const navigate = useNavigate(); // Initialize useNavigate hook
 
   // Fetch user info
   useEffect(() => {
@@ -68,7 +73,7 @@ const Forum = () => {
     fetchThreads();
   }, []);
 
-  // Fetch messages when a thread is selected
+  
   useEffect(() => {
     if (selectedThread) {
       const fetchMessages = async () => {
@@ -91,7 +96,7 @@ const Forum = () => {
 
       fetchMessages();
     } else {
-      setMessages([]); // Clear messages if no thread is selected
+      setMessages([]);
     }
   }, [selectedThread]);
 
@@ -159,8 +164,6 @@ const Forum = () => {
     }
   };
 
-  // Removed handleThreadDelete function
-
   const handleCreateThread = async () => {
     if (newThreadTitle.trim()) {
       try {
@@ -193,16 +196,16 @@ const Forum = () => {
 
   const handleThreadSelect = (thread) => {
     setSelectedThread(thread);
-    setMessages([]); // Clear messages when a new thread is selected
+    setMessages([]); 
   };
 
   const handleContextMenu = (event, item, type) => {
     event.preventDefault();
 
-    // Show context menu only for messages
+    
     if (type === "threads") return;
 
-    // Check if the logged-in user is the creator
+   
     if (type === "messages" && item.creator_id !== loggedInUserId) return;
 
     setContextMenuPosition({ x: event.clientX, y: event.clientY });
@@ -219,7 +222,6 @@ const Forum = () => {
       await handleMessageDelete(item.id);
     }
 
-    // Hide context menu after deletion
     setContextMenuVisible(false);
   };
 
@@ -227,10 +229,33 @@ const Forum = () => {
     setContextMenuVisible(false);
   };
 
+  const handleEmojiClick = (emojiObject) => {
+    const emoji = emojiObject.emoji;
+    setNewMessage(newMessage + emoji);
+    setEmojiPickerVisible(false);
+  };
+
+  const toggleEmojiPicker = () => {
+    setEmojiPickerVisible(!emojiPickerVisible);
+  };
+
+  const handleLogoClick = () => {
+    navigate("/home"); 
+  };
+
+  const handleNotificationsClick = () => {
+    navigate("/notifications"); 
+  };
+
   return (
     <div className="forum">
       <nav className="navbar">
-        <img src={logoImage} alt="Logo" className="navbar-logo" />
+        <img
+          src={logoImage}
+          alt="Logo"
+          className="navbar-logo"
+          onClick={handleLogoClick} 
+        />
         <div className="navbar-title">Neighbourhood Net Forum</div>
         <input
           type="text"
@@ -255,12 +280,20 @@ const Forum = () => {
               <button onClick={() => setCreatingThread(false)}>Cancel</button>
             </div>
           ) : (
-            <button
-              className="notifications"
-              onClick={() => setCreatingThread(true)}
-            >
-              + New Thread
-            </button>
+            <>
+              <button
+                className="notifications"
+                onClick={() => setCreatingThread(true)}
+              >
+                + New Thread
+              </button>
+              <button
+                className="notifications"
+                onClick={handleNotificationsClick} 
+              >
+                Go to Notifications
+              </button>
+            </>
           )}
           <ul>
             {threads
@@ -271,57 +304,55 @@ const Forum = () => {
                 <li
                   key={thread.id}
                   onClick={() => handleThreadSelect(thread)}
-                  onContextMenu={(e) =>
-                    handleContextMenu(e, thread, "threads")
-                  }
+                  onContextMenu={(e) => handleContextMenu(e, thread, "threads")}
                 >
                   {thread.title}
                 </li>
               ))}
           </ul>
         </div>
-        {selectedThread ? (
-          <div className="chat-window">
-            <div className="chat-header">{selectedThread.title}</div>
-            <div className="messages">
-              {messages.map((message) => (
-                <div
-                  key={message.id}
-                  className="message"
-                  onContextMenu={(e) =>
-                    handleContextMenu(e, message, "messages")
-                  }
-                >
-                  <div className="message-author">
-                    {getUsernameById(message.creator_id)}:
+        <div className="chat-window">
+          {selectedThread ? (
+            <>
+              <div className="chat-header">{selectedThread.title}</div>
+              <div className="messages">
+                {messages.map((message) => (
+                  <div
+                    key={message.id}
+                    className="message"
+                    onContextMenu={(e) => handleContextMenu(e, message, "messages")}
+                  >
+                    <strong>{getUsernameById(message.creator_id)}</strong>
+                    <p>{message.text}</p>
                   </div>
-                  <div className="message-text">{message.text}</div>
-                </div>
-              ))}
-            </div>
-            <div className="message-input">
-              <input
-                type="text"
-                placeholder="Type your message..."
-                value={newMessage}
-                onChange={(e) => setNewMessage(e.target.value)}
-              />
-              <button onClick={handleSend}>Send</button>
-            </div>
-          </div>
-        ) : (
-          <div className="chat-window">
-            <div className="chat-header">Select a thread to start chatting</div>
-          </div>
-        )}
+                ))}
+              </div>
+              <div className="message-input">
+                <input
+                  type="text"
+                  placeholder="Type a message..."
+                  value={newMessage}
+                  onChange={(e) => setNewMessage(e.target.value)}
+                />
+                <button onClick={toggleEmojiPicker}>😊</button>
+                <button onClick={handleSend}>Send</button>
+              </div>
+              {emojiPickerVisible && (
+                <EmojiPicker
+                  onEmojiClick={handleEmojiClick}
+                  height={350}
+                />
+              )}
+            </>
+          ) : (
+            <p>Select a thread to view messages</p>
+          )}
+        </div>
       </div>
       {contextMenuVisible && (
         <div
           className="context-menu"
-          style={{
-            top: contextMenuPosition.y,
-            left: contextMenuPosition.x,
-          }}
+          style={{ top: contextMenuPosition.y, left: contextMenuPosition.x }}
         >
           <button onClick={handleDelete}>Delete</button>
           <button onClick={handleCancel}>Cancel</button>
