@@ -410,7 +410,7 @@ class ThreadListResource(Resource):
 
     def post(self):
         data = request.json
-        title = data.get('title', 'Untitled Thread')  # Default to 'Untitled Thread' if title is missing
+        title = data.get('title', 'Untitled Thread')  
         thread = ForumThread(
             title=title,
             creator_id=data['creator_id']

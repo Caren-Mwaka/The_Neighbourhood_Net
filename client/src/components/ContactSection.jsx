@@ -18,6 +18,7 @@ const validationSchema = yup.object({
 });
 
 const ContactSection = () => {
+  console.log(import.meta.env.VITE_BASE_URL);
   const formik = useFormik({
     initialValues: {
       fullName: '',
@@ -26,7 +27,7 @@ const ContactSection = () => {
     },
     validationSchema: validationSchema,
     onSubmit: (values, { resetForm }) => {
-      fetch('http://localhost:5555/contact-messages', {
+      fetch(`${import.meta.env.VITE_BASE_URL}/contact-messages`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
