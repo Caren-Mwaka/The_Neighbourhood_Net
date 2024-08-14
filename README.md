@@ -71,42 +71,6 @@ Learning Goals
     Familiarize with tools and technologies for organizing community events.
     Gain skills in using web platforms or apps for communication and event planning.
 
-Set Instructions
-
-To get started with The Neighbourhood Net, follow these steps:
-
-    Install Dependencies:
-
-    bash
-
-pipenv install
-
-Activate Virtual Environment:
-
-bash
-
-pipenv shell
-
-Run the Application:
-
-bash
-
-    python3 app.py
-
-These commands will set up your environment, install necessary packages, and create the database for the application.
-Key Vocabulary
-
-    Community Watch: A group of people who monitor their neighborhood to prevent and report suspicious activities.
-    Engagement: Active participation and involvement in community activities.
-    Routing: The process of defining and managing different views or pages in a web application.
-    Safety Protocols: Guidelines and procedures to ensure the security and safety of the community.
-
-Introduction
-
-Community watch programs are vital for maintaining safety and fostering a sense of belonging in neighborhoods. By combining traditional community efforts with modern technology, The Neighbourhood Net aims to enhance local interactions and streamline event planning. This platform will serve as a hub for safety alerts, community discussions, and event coordination.
-Routing Views
-
-The platform includes several key views to support its functions:
 
     Home Page: Provides an overview of community activities, alerts, and recent discussions.
     Safety Alerts: A dedicated page for reporting and viewing local safety concerns and incidents.
