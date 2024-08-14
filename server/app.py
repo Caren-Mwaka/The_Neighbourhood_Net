@@ -467,7 +467,6 @@ class MessageListResource(Resource):
         db.session.add(message)
         db.session.commit()
         
-        
         creator = User.query.get(creator_id)
         creator_username = creator.username if creator else 'Unknown User'
         
@@ -475,6 +474,33 @@ class MessageListResource(Resource):
             'id': message.id,
             'text': message.text,
             'creator_id': creator_id,
+            'creator_username': creator_username,
+            'created_at': message.created_at
+        })
+
+    def patch(self, thread_id, message_id):
+        data = request.json
+        new_text = data.get('text')
+
+        if not new_text:
+            return {'error': 'Text is required'}, 400
+        
+        message = ForumMessage.query.filter_by(id=message_id, thread_id=thread_id).first()
+
+        if not message:
+            return {'error': 'Message not found'}, 404
+        
+        # Update the message text
+        message.text = new_text
+        db.session.commit()
+        
+        creator = User.query.get(message.creator_id)
+        creator_username = creator.username if creator else 'Unknown User'
+        
+        return jsonify({
+            'id': message.id,
+            'text': message.text,
+            'creator_id': message.creator_id,
             'creator_username': creator_username,
             'created_at': message.created_at
         })
@@ -488,6 +514,7 @@ class MessageListResource(Resource):
         db.session.delete(message)
         db.session.commit()
         return {'message': 'Message deleted successfully'}
+
     
 class ContactMessageResource(Resource):
     def post(self):
