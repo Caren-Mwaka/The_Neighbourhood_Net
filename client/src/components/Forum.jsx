@@ -1,8 +1,9 @@
 import React, { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom"; 
+import { useNavigate } from "react-router-dom";
 import "./Forum.css";
 import logoImage from "../assets/neighbourhood-net-logo.png";
 import EmojiPicker from "emoji-picker-react";
+import { toast } from "react-toastify"; // Import toast for notifications
 
 const Forum = () => {
   const [users, setUsers] = useState([]);
@@ -21,10 +22,10 @@ const Forum = () => {
   const [itemToDelete, setItemToDelete] = useState(null);
   const [creatingThread, setCreatingThread] = useState(false);
   const [emojiPickerVisible, setEmojiPickerVisible] = useState(false);
+  const [messageToEdit, setMessageToEdit] = useState(null);
 
-  const navigate = useNavigate(); // Initialize useNavigate hook
+  const navigate = useNavigate();
 
-  // Fetch user info
   useEffect(() => {
     const fetchUserInfo = async () => {
       try {
@@ -73,7 +74,6 @@ const Forum = () => {
     fetchThreads();
   }, []);
 
-  
   useEffect(() => {
     if (selectedThread) {
       const fetchMessages = async () => {
@@ -105,8 +105,23 @@ const Forum = () => {
     return user ? user.username : "Unknown User";
   };
 
+  // Helper function to validate that the message contains only text and emojis
+  const isTextOrEmojiOnly = (message) => {
+    const urlPattern = /(https?:\/\/[^\s]+)/g;
+    return !urlPattern.test(message);
+  };
+
+  // Helper function to check if the message can be edited (within 24 hours)
+  const canEditMessage = (createdAt) => {
+    const messageTime = new Date(createdAt).getTime();
+    const now = new Date().getTime();
+    const twentyFourHours = 24 * 60 * 60 * 1000;
+    return now - messageTime < twentyFourHours;
+  };
+
+  // Update the handleSend function to include validation
   const handleSend = async () => {
-    if (newMessage.trim() && selectedThread) {
+    if (newMessage.trim() && selectedThread && isTextOrEmojiOnly(newMessage)) {
       try {
         const response = await fetch(
           `http://localhost:5555/threads/${selectedThread.id}/messages`,
@@ -134,6 +149,47 @@ const Forum = () => {
       } catch (error) {
         console.error("Error:", error);
       }
+    } else {
+      toast.error("Messages can only contain text and emojis, no links are allowed.");
+    }
+  };
+
+  // Function to handle message editing
+  const handleEditMessage = async (messageId, newText) => {
+    if (!isTextOrEmojiOnly(newText)) {
+      toast.error("Messages can only contain text and emojis, no links are allowed.");
+      return;
+    }
+
+    try {
+      const response = await fetch(
+        `http://localhost:5555/threads/${selectedThread.id}/messages/${messageId}`,
+        {
+          method: "PATCH",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${localStorage.getItem("token")}`,
+          },
+          body: JSON.stringify({
+            text: newText,
+          }),
+        }
+      );
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error || "Failed to edit message");
+      }
+
+      const updatedMessage = await response.json();
+      setMessages((prevMessages) =>
+        prevMessages.map((message) =>
+          message.id === messageId ? updatedMessage : message
+        )
+      );
+      setMessageToEdit(null);
+    } catch (error) {
+      console.error("Error:", error);
     }
   };
 
@@ -196,20 +252,24 @@ const Forum = () => {
 
   const handleThreadSelect = (thread) => {
     setSelectedThread(thread);
-    setMessages([]); 
+    setMessages([]);
   };
 
   const handleContextMenu = (event, item, type) => {
     event.preventDefault();
 
-    
-    if (type === "threads") return;
-
-   
-    if (type === "messages" && item.creator_id !== loggedInUserId) return;
+    if (type === "messages") {
+      if (
+        item.creator_id !== loggedInUserId ||
+        !canEditMessage(item.created_at)
+      ) {
+        return;
+      }
+    }
 
     setContextMenuPosition({ x: event.clientX, y: event.clientY });
     setItemToDelete({ item, type });
+    setMessageToEdit(null);
     setContextMenuVisible(true);
   };
 
@@ -225,75 +285,74 @@ const Forum = () => {
     setContextMenuVisible(false);
   };
 
+  const handleEdit = () => {
+    if (!itemToDelete) return;
+
+    const newText = prompt("Edit your message:", itemToDelete.item.text);
+
+    if (newText !== null) {
+      handleEditMessage(itemToDelete.item.id, newText);
+    }
+  };
+
   const handleCancel = () => {
     setContextMenuVisible(false);
   };
 
+  const handleNotificationsClick = () => {
+    navigate("/notifications");
+  };
+
+  const handleHomeClick = () => {
+    navigate("/home");
+  };
+
   const handleEmojiClick = (emojiObject) => {
     const emoji = emojiObject.emoji;
-    setNewMessage(newMessage + emoji);
-    setEmojiPickerVisible(false);
-  };
-
-  const toggleEmojiPicker = () => {
-    setEmojiPickerVisible(!emojiPickerVisible);
-  };
-
-  const handleLogoClick = () => {
-    navigate("/home"); 
-  };
-
-  const handleNotificationsClick = () => {
-    navigate("/notifications"); 
+    setNewMessage((prevMessage) => prevMessage + emoji);
   };
 
   return (
     <div className="forum">
-      <nav className="navbar">
+      <div className="navbar">
         <img
           src={logoImage}
           alt="Logo"
           className="navbar-logo"
-          onClick={handleLogoClick} 
+          onClick={handleHomeClick}
         />
-        <div className="navbar-title">Neighbourhood Net Forum</div>
-        <input
-          type="text"
-          className="search-bar"
-          placeholder="Search..."
-          value={searchTerm}
-          onChange={(e) => setSearchTerm(e.target.value)}
-        />
-      </nav>
+        <div className="navbar-title">Forum</div>
+        <div className="navbar-buttons">
+          <button className="notifications" onClick={handleNotificationsClick}>
+            Notifications
+          </button>
+        </div>
+      </div>
       <div className="main-content">
         <div className="sidebar">
-          <h2>Threads</h2>
-          {creatingThread ? (
+          <input
+            type="text"
+            placeholder="Search threads..."
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+          />
+          <button
+            className="notifications"
+            onClick={() => setCreatingThread(true)}
+          >
+            + New Thread
+          </button>
+          {creatingThread && (
             <div className="create-thread">
               <input
                 type="text"
-                placeholder="Enter new thread title..."
                 value={newThreadTitle}
                 onChange={(e) => setNewThreadTitle(e.target.value)}
+                placeholder="Thread Title"
               />
               <button onClick={handleCreateThread}>Create</button>
               <button onClick={() => setCreatingThread(false)}>Cancel</button>
             </div>
-          ) : (
-            <>
-              <button
-                className="notifications"
-                onClick={() => setCreatingThread(true)}
-              >
-                + New Thread
-              </button>
-              <button
-                className="notifications"
-                onClick={handleNotificationsClick} 
-              >
-                Go to Notifications
-              </button>
-            </>
           )}
           <ul>
             {threads
@@ -304,7 +363,6 @@ const Forum = () => {
                 <li
                   key={thread.id}
                   onClick={() => handleThreadSelect(thread)}
-                  onContextMenu={(e) => handleContextMenu(e, thread, "threads")}
                 >
                   {thread.title}
                 </li>
@@ -312,48 +370,50 @@ const Forum = () => {
           </ul>
         </div>
         <div className="chat-window">
-          {selectedThread ? (
-            <>
-              <div className="chat-header">{selectedThread.title}</div>
-              <div className="messages">
-                {messages.map((message) => (
-                  <div
-                    key={message.id}
-                    className="message"
-                    onContextMenu={(e) => handleContextMenu(e, message, "messages")}
-                  >
-                    <strong>{getUsernameById(message.creator_id)}</strong>
-                    <p>{message.text}</p>
-                  </div>
-                ))}
+          <div className="chat-header">
+            {selectedThread ? selectedThread.title : "Select a thread"}
+          </div>
+          <div className="messages">
+            {messages.map((message) => (
+              <div
+                key={message.id}
+                className={`message ${
+                  message.creator_id === loggedInUserId ? "my-message" : ""
+                }`}
+                onContextMenu={(e) =>
+                  handleContextMenu(e, message, "messages")
+                }
+              >
+                <strong>{getUsernameById(message.creator_id)}</strong>: {message.text}
               </div>
-              <div className="message-input">
-                <input
-                  type="text"
-                  placeholder="Type a message..."
-                  value={newMessage}
-                  onChange={(e) => setNewMessage(e.target.value)}
-                />
-                <button onClick={toggleEmojiPicker}>😊</button>
-                <button onClick={handleSend}>Send</button>
-              </div>
-              {emojiPickerVisible && (
-                <EmojiPicker
-                  onEmojiClick={handleEmojiClick}
-                  height={350}
-                />
-              )}
-            </>
-          ) : (
-            <p>Select a thread to view messages</p>
+            ))}
+          </div>
+          {selectedThread && (
+            <div className="message-input">
+              <input
+                type="text"
+                value={newMessage}
+                onChange={(e) => setNewMessage(e.target.value)}
+                placeholder="Type a message..."
+              />
+              <button onClick={handleSend}>Send</button>
+              <button onClick={() => setEmojiPickerVisible(!emojiPickerVisible)}>
+                😊
+              </button>
+              {emojiPickerVisible && <EmojiPicker onEmojiClick={handleEmojiClick} />}
+            </div>
           )}
         </div>
       </div>
       {contextMenuVisible && (
         <div
           className="context-menu"
-          style={{ top: contextMenuPosition.y, left: contextMenuPosition.x }}
+          style={{
+            top: `${contextMenuPosition.y}px`,
+            left: `${contextMenuPosition.x}px`,
+          }}
         >
+          <button onClick={handleEdit}>Edit</button>
           <button onClick={handleDelete}>Delete</button>
           <button onClick={handleCancel}>Cancel</button>
         </div>

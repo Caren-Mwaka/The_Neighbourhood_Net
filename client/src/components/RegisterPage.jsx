@@ -49,7 +49,7 @@ const RegisterPage = () => {
       if (response.ok) {
         const result = await response.json();
         toast.success("Registration successful!");
-        navigate('/home'); 
+        navigate('/login'); 
       } else {
         const error = await response.json();
         toast.error("Registration failed. Please try again.");
@@ -125,7 +125,7 @@ const RegisterPage = () => {
                 <ErrorMessage name="confirmPassword" component="div" className="error" />
               </div>
 
-              <button type="submit">Continue To Homepage</button>
+              <button type="submit">Continue </button>
             </Form>
           )}
         </Formik>
