@@ -6,7 +6,7 @@ from flask_bcrypt import Bcrypt
 from flask_jwt_extended import JWTManager, create_access_token, jwt_required, get_jwt_identity
 from flask_restful import Api, Resource
 from werkzeug.exceptions import NotFound
-from datetime import datetime
+from datetime import datetime, timedelta
 
 
 app = Flask(__name__)
@@ -15,6 +15,9 @@ app.config['SECRET_KEY'] = 'your-unique-secret-key'
 app.config['JWT_SECRET_KEY'] = 'super-secret-key'
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///app.db'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+
+# Set JWT token expiration time to 7 days
+app.config['JWT_ACCESS_TOKEN_EXPIRES'] = timedelta(days=7)
 
 db.init_app(app)
 bcrypt = Bcrypt(app)
@@ -138,7 +141,8 @@ class LoginResource(Resource):
             return {"error": "Invalid credentials"}, 401
 
         if not bcrypt.check_password_hash(user.password, password):
-            return {"error": "Invalid credentials"}, 401
+            return {"error": "Invalid credentials"}, 
+        401
 
         token = create_access_token(identity={'username': user.username, 'role': user.role})
         return {"message": "Logged in successfully", "token": token, "role": user.role, "user_id": user.id}, 200
@@ -197,8 +201,8 @@ class EventResource(Resource):
         data = request.json
         event.name = data.get('name', event.name)
         event.type = data.get('type', event.type)
-        event.date = data.get('date', event.date)
-        event.time = data.get('time', event.time)
+        event.date = datetime.strptime(data.get('date', event.date.strftime('%Y-%m-%d')), '%Y-%m-%d').date()
+        event.time = parse_time(data.get('time', event.time.strftime('%H:%M:%S')))
         event.location = data.get('location', event.location)
         event.image_url = data.get('image_url', event.image_url)
 
@@ -341,17 +345,17 @@ class IncidentResource(Resource):
 
         data = request.json
         incident.name = data.get('name', incident.name)
-        incident.date = datetime.strptime(data.get('date', incident.date), '%Y-%m-%d').date()  
+        incident.date = datetime.strptime(data.get('date', incident.date.strftime('%Y-%m-%d')), '%Y-%m-%d').date()
         incident.type = data.get('type', incident.type)
         incident.priority = data.get('priority', incident.priority)
         incident.location = data.get('location', incident.location)
         incident.description = data.get('description', incident.description)
+        incident.solved = data.get('solved', incident.solved)
 
         db.session.commit()
         return incident.to_dict(), 200
-     
-    @app.route('/incidents/<int:incident_id>', methods=['DELETE'])
-    def delete_incident(incident_id):
+
+    def delete(self, incident_id):
         incident = Incident.query.get(incident_id)
         if not incident:
             return {"error": "Incident not found"}, 404
@@ -400,38 +404,39 @@ class ThreadListResource(Resource):
         threads = ForumThread.query.all()
         return jsonify([{
             'id': thread.id,
-            'title': thread.title,
+            'title': thread.title or 'Untitled Thread',
             'creator_id': thread.creator_id,
             'created_at': thread.created_at
         } for thread in threads])
 
     def post(self):
         data = request.json
+        title = data.get('title', 'Untitled Thread')
         thread = ForumThread(
-            title=data['title'],
+            title=title,
             creator_id=data['creator_id']
         )
         db.session.add(thread)
         db.session.commit()
-        return jsonify({'id': thread.id})
+        return jsonify({'id': thread.id, 'title': thread.title})
 
-    def delete(self):
-        data = request.json
-        thread_id = data.get('id')
 
-        if not thread_id:
-            return {'error': 'Thread ID is required'}, 400
-
+    def delete(self, thread_id):
         thread = ForumThread.query.get(thread_id)
 
         if not thread:
             return {'error': 'Thread not found'}, 404
 
-        db.session.delete(thread)
-        db.session.commit()
-        return {'message': 'Thread deleted successfully'}
-
-
+        try:
+            # Delete associated messages
+            ForumMessage.query.filter_by(thread_id=thread_id).delete()
+            db.session.delete(thread)
+            db.session.commit()
+            return {'message': 'Thread deleted successfully'}
+        except Exception as e:
+            db.session.rollback()
+            return {'error': str(e)}, 500
+        
 class MessageListResource(Resource):
     def get(self, thread_id):
         messages = ForumMessage.query.filter_by(thread_id=thread_id).all()
@@ -463,7 +468,6 @@ class MessageListResource(Resource):
         db.session.add(message)
         db.session.commit()
         
-        # Fetch username
         creator = User.query.get(creator_id)
         creator_username = creator.username if creator else 'Unknown User'
         
@@ -475,13 +479,33 @@ class MessageListResource(Resource):
             'created_at': message.created_at
         })
 
-    def delete(self, thread_id, message_id):
+    def patch(self, thread_id, message_id):
         data = request.json
-        message_id = data.get('id')
+        new_text = data.get('text')
 
-        if not message_id:
-            return {'error': 'Message ID is required'}, 400
+        if not new_text:
+            return {'error': 'Text is required'}, 400
+        
+        message = ForumMessage.query.filter_by(id=message_id, thread_id=thread_id).first()
 
+        if not message:
+            return {'error': 'Message not found'}, 404
+        
+        message.text = new_text
+        db.session.commit()
+        
+        creator = User.query.get(message.creator_id)
+        creator_username = creator.username if creator else 'Unknown User'
+        
+        return jsonify({
+            'id': message.id,
+            'text': message.text,
+            'creator_id': message.creator_id,
+            'creator_username': creator_username,
+            'created_at': message.created_at
+        })
+
+    def delete(self, thread_id, message_id):
         message = ForumMessage.query.filter_by(id=message_id, thread_id=thread_id).first()
 
         if not message:
@@ -490,6 +514,8 @@ class MessageListResource(Resource):
         db.session.delete(message)
         db.session.commit()
         return {'message': 'Message deleted successfully'}
+
+    
 class ContactMessageResource(Resource):
     def post(self):
         data = request.get_json()
@@ -505,7 +531,8 @@ class ContactMessageResource(Resource):
         db.session.commit()
 
         return new_message.to_dict(), 201
-  
+
+
 api.add_resource(Index, '/')
 api.add_resource(UserResource, '/users', '/users/<int:user_id>')
 api.add_resource(RegisterResource, '/register')
@@ -514,10 +541,9 @@ api.add_resource(EventResource, '/events', '/events/<int:event_id>')
 api.add_resource(RSVPResource, '/rsvp', '/rsvp/<int:rsvp_id>')
 api.add_resource(IncidentResource, '/incidents', '/incidents/<int:incident_id>')
 api.add_resource(NotificationResource, '/notifications', '/notifications/<int:notification_id>')
-api.add_resource(ThreadListResource, '/threads')
-api.add_resource(MessageListResource, '/threads/<int:thread_id>/messages')
+api.add_resource(ThreadListResource, '/threads', '/threads/<int:thread_id>' )
+api.add_resource(MessageListResource,'/threads/<int:thread_id>/messages', '/threads/<int:thread_id>/messages/<int:message_id>')
 api.add_resource(ContactMessageResource, '/contact-messages')
 
-
 if __name__ == '__main__':
-   app.run(port=5555, debug=True)
+    app.run(port=5555, debug=True)
