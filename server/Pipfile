@@ -12,6 +12,8 @@ flask-jwt-extended = "*"
 flask-bcrypt = "*"
 flask-restful = "*"
 flask-mail = "*"
+python-dotenv = "*"
+gunicorn = "*"
 
 [dev-packages]
 

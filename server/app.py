@@ -1,4 +1,4 @@
-
+from dotenv import load_dotenv
 from flask import Flask, jsonify, request, session
 from flask_migrate import Migrate
 from flask_cors import CORS
@@ -8,13 +8,13 @@ from flask_jwt_extended import JWTManager, create_access_token, jwt_required, ge
 from flask_restful import Api, Resource
 from werkzeug.exceptions import NotFound
 from datetime import datetime, timedelta
-
+import os
 
 app = Flask(__name__)
 
-app.config['SECRET_KEY'] = 'your-unique-secret-key'
-app.config['JWT_SECRET_KEY'] = 'super-secret-key'
-app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///app.db'
+app.config['SECRET_KEY'] = 'SECRET_KEY'
+app.config['JWT_SECRET_KEY'] = 'JWT_SECRET_KEY'
+app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get('DATABASE_URI')
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
 # Set JWT token expiration time to 7 days
@@ -23,6 +23,7 @@ app.config['JWT_ACCESS_TOKEN_EXPIRES'] = timedelta(days=7)
 db.init_app(app)
 bcrypt = Bcrypt(app)
 migrate = Migrate(app, db)
+load_dotenv()
 
 # Initialize CORS with proper settings
 CORS(app, resources={r"/*": {"origins": "http://localhost:5173", "supports_credentials": True}})
