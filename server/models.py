@@ -52,7 +52,8 @@ class User(db.Model):
             "contact_number": self.contact_number,  
             "address": self.address,
             "created_at": self.created_at.isoformat(),
-            "events": [event.id for event in self.events]
+            "events": [event.id for event in self.events],
+            "avatar": self.avatar
         }
 
 class ForumThread(db.Model):
