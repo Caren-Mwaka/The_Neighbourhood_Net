@@ -24,3 +24,4 @@ sqlalchemy==2.0.32; python_version >= '3.7'
 typing-extensions==4.12.2; python_version >= '3.8'
 werkzeug==3.0.3; python_version >= '3.8'
 gunicorn  
+python-dotenv
