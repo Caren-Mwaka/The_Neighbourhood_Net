@@ -3,7 +3,6 @@ import './EventsList.css';
 import headerimage from "../assets/friends.jpg";
 import { toast } from 'react-toastify';
 
-// const baseURL = import.meta.env.VITE_BASE_URL || 'https://the-neighbourhood-net-1.onrender.com';
 
 const defaultImages = {
   sports: "https://images.pexels.com/photos/1263426/pexels-photo-1263426.jpeg?auto=compress&cs=tinysrgb&w=600",
@@ -59,7 +58,7 @@ const EventsList = () => {
     const fetchEvents = async () => {
       setLoading(true);
       try {
-        const response = await fetch('https://the-neighbourhood-net-1.onrender.com/api/events');
+        const response = await fetch(`${import.meta.env.VITE_BASE_URL}/events`);
         if (!response.ok) {
           throw new Error('Network response was not ok');
         }
@@ -88,7 +87,7 @@ const EventsList = () => {
     const token = localStorage.getItem('token'); 
     
     try {
-      const response = await fetch('https://the-neighbourhood-net-1.onrender.com/api/rsvp', {
+      const response = await fetch(`${import.meta.env.VITE_BASE_URL}/rsvp`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
