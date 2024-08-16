@@ -14,7 +14,7 @@ app = Flask(__name__)
 
 app.config['SECRET_KEY'] = 'SECRET_KEY'
 app.config['JWT_SECRET_KEY'] = 'JWT_SECRET_KEY'
-app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get('DATABASE_URI')
+app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get('')
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
 # Set JWT token expiration time to 7 days
@@ -26,7 +26,7 @@ migrate = Migrate(app, db)
 load_dotenv()
 
 # Initialize CORS with proper settings
-CORS(app, resources={r"/*": {"origins": "http://localhost:5173", "supports_credentials": True}})
+CORS(app, resources={r"/*": {"origins": "BASE_URL", "supports_credentials": True}})
 
 jwt = JWTManager(app)
 api = Api(app)

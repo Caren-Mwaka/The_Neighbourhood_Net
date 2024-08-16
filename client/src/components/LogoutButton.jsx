@@ -9,7 +9,7 @@ const LogoutButton = () => {
   const handleLogout = async () => {
     console.log('Logout button clicked');
     try {
-      const response = await fetch('http://localhost:5555/logout', {
+      const response = await fetch(`${import.meta.env.VITE_BASE_URL}`, {
         method: 'POST',
         credentials: 'include',
         headers: {

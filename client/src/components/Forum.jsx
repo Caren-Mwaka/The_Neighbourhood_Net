@@ -29,7 +29,7 @@ const Forum = () => {
   useEffect(() => {
     const fetchUserInfo = async () => {
       try {
-        const response = await fetch("http://localhost:5555/user-info", {
+        const response = await fetch(`${import.meta.env.VITE_BASE_URL}/user-info`, {
           headers: {
             Authorization: `Bearer ${localStorage.getItem("token")}`,
           },
@@ -48,7 +48,7 @@ const Forum = () => {
   useEffect(() => {
     const fetchUsers = async () => {
       try {
-        const response = await fetch("http://localhost:5555/users");
+        const response = await fetch(`${import.meta.env.VITE_BASE_URL}/users`);
         const data = await response.json();
         setUsers(data.users);
       } catch (error) {
@@ -63,7 +63,7 @@ const Forum = () => {
   useEffect(() => {
     const fetchThreads = async () => {
       try {
-        const response = await fetch("http://localhost:5555/threads");
+        const response = await fetch(`${import.meta.env.VITE_BASE_URL}/threads`);
         const data = await response.json();
         setThreads(data);
       } catch (error) {
@@ -79,7 +79,7 @@ const Forum = () => {
       const fetchMessages = async () => {
         try {
           const response = await fetch(
-            `http://localhost:5555/threads/${selectedThread.id}/messages`
+            `${import.meta.env.VITE_BASE_URL}/threads/${selectedThread.id}/messages`
           );
           if (!response.ok) {
             throw new Error("Network response was not ok");
@@ -124,7 +124,7 @@ const Forum = () => {
     if (newMessage.trim() && selectedThread && isTextOrEmojiOnly(newMessage)) {
       try {
         const response = await fetch(
-          `http://localhost:5555/threads/${selectedThread.id}/messages`,
+          `${import.meta.env.VITE_BASE_URL}/threads/${selectedThread.id}/messages`,
           {
             method: "POST",
             headers: {
@@ -163,7 +163,7 @@ const Forum = () => {
 
     try {
       const response = await fetch(
-        `http://localhost:5555/threads/${selectedThread.id}/messages/${messageId}`,
+        `${import.meta.env.VITE_BASE_URL}/threads/${selectedThread.id}/messages/${messageId}`,
         {
           method: "PATCH",
           headers: {
@@ -196,7 +196,7 @@ const Forum = () => {
   const handleMessageDelete = async (messageId) => {
     try {
       const response = await fetch(
-        `http://localhost:5555/threads/${selectedThread.id}/messages/${messageId}`,
+        `${import.meta.env.VITE_BASE_URL}/threads/${selectedThread.id}/messages/${messageId}`,
         {
           method: "DELETE",
           headers: {
@@ -223,7 +223,7 @@ const Forum = () => {
   const handleCreateThread = async () => {
     if (newThreadTitle.trim()) {
       try {
-        const response = await fetch("http://localhost:5555/threads", {
+        const response = await fetch(`${import.meta.env.VITE_BASE_URL}/threads`, {
           method: "POST",
           headers: {
             "Content-Type": "application/json",

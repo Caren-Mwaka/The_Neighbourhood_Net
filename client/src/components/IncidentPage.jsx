@@ -22,7 +22,7 @@ function IncidentPage() {
   const [filter, setFilter] = useState('all');
 
   useEffect(() => {
-    fetch('http://localhost:5555/incidents')
+    fetch(`${import.meta.env.VITE_BASE_URL}/incidents`)
       .then(response => response.json())
       .then(data => {
         if (data && Array.isArray(data.incidents)) {
@@ -38,7 +38,7 @@ function IncidentPage() {
   }, []);
 
   const handleSubmit = (values, { resetForm }) => {
-    fetch('http://localhost:5555/incidents', {
+    fetch(`${import.meta.env.VITE_BASE_URL}/incidents`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',

@@ -75,7 +75,7 @@ const AdminDashboard = () => {
 
   const fetchUsers = async () => {
     try {
-      const response = await fetch("http://localhost:5555/users");
+      const response = await fetch(`${import.meta.env.VITE_BASE_URL}/users`);
       const data = await response.json();
       setUsers(data.users || []);
     } catch (error) {
@@ -86,7 +86,7 @@ const AdminDashboard = () => {
 
   const fetchIncidents = async () => {
     try {
-      const response = await fetch("http://localhost:5555/incidents");
+      const response = await fetch(`${import.meta.env.VITE_BASE_URL}/incidents`);
       const data = await response.json();
       setIncidents(data.incidents || []);
     } catch (error) {
@@ -97,7 +97,7 @@ const AdminDashboard = () => {
 
   const fetchEvents = async () => {
     try {
-      const response = await fetch("http://localhost:5555/events");
+      const response = await fetch(`${import.meta.env.VITE_BASE_URL}/events`);
       const data = await response.json();
       setEvents(data.events || []);
     } catch (error) {
@@ -108,7 +108,7 @@ const AdminDashboard = () => {
 
   const fetchNotifications = async () => {
     try {
-      const response = await fetch("http://localhost:5555/notifications");
+      const response = await fetch(`${import.meta.env.VITE_BASE_URL}/notifications`);
       const data = await response.json();
       setNotifications(data.notifications || []);
     } catch (error) {
@@ -119,7 +119,7 @@ const AdminDashboard = () => {
 
   const handleAddUser = async () => {
     try {
-      const response = await fetch("http://localhost:5555/users", {
+      const response = await fetch(`${import.meta.env.VITE_BASE_URL}/users`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(newUser),
@@ -146,7 +146,7 @@ const AdminDashboard = () => {
 
   const handleAddIncident = async () => {
     try {
-      const response = await fetch("http://localhost:5555/incidents", {
+      const response = await fetch(`${import.meta.env.VITE_BASE_URL}/incidents`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(newIncident),
@@ -176,7 +176,7 @@ const AdminDashboard = () => {
     const formattedTime =
       newEvent.time.length === 5 ? `${newEvent.time}:00` : newEvent.time;
     try {
-      const response = await fetch("http://localhost:5555/events", {
+      const response = await fetch(`${import.meta.env.VITE_BASE_URL}/events`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ ...newEvent, time: formattedTime }),
@@ -204,7 +204,7 @@ const AdminDashboard = () => {
 
   const handleAddNotification = async () => {
     try {
-      const response = await fetch("http://localhost:5555/notifications", {
+      const response = await fetch(`${import.meta.env.VITE_BASE_URL}/notifications`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(newNotification),
@@ -228,7 +228,7 @@ const AdminDashboard = () => {
 
   const handleDeleteUser = async (userId) => {
     try {
-      const response = await fetch(`http://localhost:5555/users/${userId}`, {
+      const response = await fetch(`${import.meta.env.VITE_BASE_URL}/users/${userId}`, {
         method: "DELETE",
       });
       if (response.ok) {
@@ -246,7 +246,7 @@ const AdminDashboard = () => {
   const handleDeleteIncident = async (incidentId) => {
     try {
       const response = await fetch(
-        `http://localhost:5555/incidents/${incidentId}`,
+        `${import.meta.env.VITE_BASE_URL}/${incidentId}`,
         {
           method: "DELETE",
         }
@@ -267,7 +267,7 @@ const AdminDashboard = () => {
 
   const handleDeleteEvent = async (eventId) => {
     try {
-      const response = await fetch(`http://localhost:5555/events/${eventId}`, {
+      const response = await fetch(`${import.meta.env.VITE_BASE_URL}/${eventId}`, {
         method: "DELETE",
       });
       if (response.ok) {
@@ -285,7 +285,7 @@ const AdminDashboard = () => {
   const handleDeleteNotification = async (notificationId) => {
     try {
       const response = await fetch(
-        `http://localhost:5555/notifications/${notificationId}`,
+        `${import.meta.env.VITE_BASE_URL}/${notificationId}`,
         {
           method: "DELETE",
         }

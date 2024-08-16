@@ -57,7 +57,7 @@ const EventsList = () => {
     const fetchEvents = async () => {
       setLoading(true);
       try {
-        const response = await fetch('http://localhost:5555/events');
+        const response = await fetch(`${import.meta.env.VITE_BASE_URL}/events`);
         if (!response.ok) {
           throw new Error('Network response was not ok');
         }
@@ -86,7 +86,7 @@ const EventsList = () => {
     const token = localStorage.getItem('token'); 
     
     try {
-      const response = await fetch(`http://127.0.0.1:5555/rsvp`, {
+      const response = await fetch(`${import.meta.env.VITE_BASE_URL}/rsvp`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

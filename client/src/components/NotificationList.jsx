@@ -10,7 +10,7 @@ const NotificationList = () => {
   useEffect(() => {
     const fetchNotifications = async () => {
       try {
-        const response = await fetch('http://localhost:5555/notifications');
+        const response = await fetch(`${import.meta.env.VITE_BASE_URL}/notifications`);
         const data = await response.json();
         console.log('Fetched Notifications:', data.notifications);
         setNotificationList(data.notifications);
@@ -25,7 +25,7 @@ const NotificationList = () => {
 
   const handleDismiss = async (id) => {
     try {
-      await fetch(`http://localhost:5555/notifications/${id}`, {
+      await fetch(`${import.meta.env.VITE_BASE_URL}/${id}`, {
         method: 'DELETE',
       });
 
