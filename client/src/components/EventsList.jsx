@@ -59,7 +59,7 @@ const EventsList = () => {
     const fetchEvents = async () => {
       setLoading(true);
       try {
-        const response = await fetch('https://the-neighbourhood-net-1.onrender.com/events');
+        const response = await fetch('https://the-neighbourhood-net-1.onrender.com/api/events');
         if (!response.ok) {
           throw new Error('Network response was not ok');
         }
@@ -88,7 +88,7 @@ const EventsList = () => {
     const token = localStorage.getItem('token'); 
     
     try {
-      const response = await fetch('https://the-neighbourhood-net-1.onrender.com/rsvp', {
+      const response = await fetch('https://the-neighbourhood-net-1.onrender.com/api/rsvp', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
