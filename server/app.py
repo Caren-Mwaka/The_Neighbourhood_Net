@@ -19,11 +19,11 @@ app.config['SECRET_KEY'] = 'SECRET_KEY'
 app.config['JWT_SECRET_KEY'] = 'JWT_SECRET_KEY'
 app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get('DATABASE_URI')
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
-app.config['MAIL_SERVER'] = 'smtp.gmail.com'  
-app.config['MAIL_PORT'] = 587
-app.config['MAIL_USERNAME'] = 'neighborhoodnetforum@gmail.com'  
-app.config['MAIL_PASSWORD'] = 'dlnz zasv nwnx oecc'  
-app.config['MAIL_DEFAULT_SENDER'] = 'neighborhoodnetforum@gmail.com'
+app.config['MAIL_SERVER'] = 'MAIL_SERVER'  
+app.config['MAIL_PORT'] = 'MAIL_PORT'
+app.config['MAIL_USERNAME'] = 'MAIL_USERNAME'  
+app.config['MAIL_PASSWORD'] = 'MAIL_PASSWORD'  
+app.config['MAIL_DEFAULT_SENDER'] = 'MAIL_DEFAULT_SENDER'
 app.config['MAIL_USE_TLS'] = True
 app.config['MAIL_USE_SSL'] = False
 
