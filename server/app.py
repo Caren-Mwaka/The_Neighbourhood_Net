@@ -1,5 +1,4 @@
-from dotenv import load_dotenv
-from flask import Flask, jsonify, request, session
+from flask import Flask, jsonify, request, session, url_for
 from flask_migrate import Migrate
 from flask_cors import CORS
 from models import db, User, Event, RSVP, Incident, Notification, ForumThread, ForumMessage, ContactMessage
@@ -8,7 +7,11 @@ from flask_jwt_extended import JWTManager, create_access_token, jwt_required, ge
 from flask_restful import Api, Resource
 from werkzeug.exceptions import NotFound
 from datetime import datetime, timedelta
+from flask_mail import Mail, Message
 import os
+import random
+import string
+from itsdangerous import URLSafeTimedSerializer, SignatureExpired, BadSignature
 
 app = Flask(__name__)
 
@@ -16,21 +19,56 @@ app.config['SECRET_KEY'] = 'SECRET_KEY'
 app.config['JWT_SECRET_KEY'] = 'JWT_SECRET_KEY'
 app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get('DATABASE_URI')
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+app.config['MAIL_SERVER'] = 'smtp.gmail.com'  
+app.config['MAIL_PORT'] = 587
+app.config['MAIL_USERNAME'] = 'neighborhoodnetforum@gmail.com'  
+app.config['MAIL_PASSWORD'] = 'dlnz zasv nwnx oecc'  
+app.config['MAIL_DEFAULT_SENDER'] = 'neighborhoodnetforum@gmail.com'
+app.config['MAIL_USE_TLS'] = True
+app.config['MAIL_USE_SSL'] = False
 
-# Set JWT token expiration time to 7 days
+
 app.config['JWT_ACCESS_TOKEN_EXPIRES'] = timedelta(days=7)
 
 db.init_app(app)
 bcrypt = Bcrypt(app)
 migrate = Migrate(app, db)
-load_dotenv()
-
-# Initialize CORS with proper settings
 CORS(app, resources={r"/*": {"origins": "https://the-neighbourhood-nhed74zio-caren-chibwaras-projects.vercel.app", "supports_credentials": True}})
-
+mail = Mail(app)
 jwt = JWTManager(app)
 api = Api(app)
 
+
+s = URLSafeTimedSerializer(app.config['SECRET_KEY'])
+
+def generate_confirmation_token(email):
+    return s.dumps(email, salt='email-confirm')
+
+def confirm_token(token, expiration=3600):
+    try:
+        email = s.loads(token, salt='email-confirm', max_age=expiration)
+    except (SignatureExpired, BadSignature):
+        return False
+    return email
+
+def send_confirmation_email(user, token):
+    confirm_url = url_for('confirm_email', token=token, _external=True)
+    subject = "Please confirm your email address"
+    body = f"""
+    Hi {user.username},
+    Thanks for signing up! Please confirm your email address by clicking the link below:
+    {confirm_url}
+    If you did not make this request, please ignore this email.
+    Best regards,
+    Your Application Team
+    """
+    msg = Message(
+        subject=subject,
+        body=body,
+        recipients=[user.email],
+        sender=app.config['MAIL_DEFAULT_SENDER']
+    )
+    mail.send(msg)
 
 def generate_token(user):
     return create_access_token(identity=user.username)
@@ -39,10 +77,9 @@ def generate_token(user):
 def logout():
     session.clear()
     response = jsonify({"message": "Logged out successfully"})
-    response.headers.add('Access-Control-Allow-Origin', 'https://the-neighbourhood-nhed74zio-caren-chibwaras-projects.vercel.app')
+    response.headers.add('Access-Control-Allow-Origin', 'http://localhost:5173')
     response.headers.add('Access-Control-Allow-Credentials', 'true')
     return response
-
 
 @app.route('/protected', methods=['GET'])
 @jwt_required()
@@ -67,7 +104,6 @@ def get_user_info():
         return jsonify(user.to_dict()), 200
     return jsonify({"error": "User not found"}), 404
 
-
 class UserResource(Resource):
     def get(self, user_id=None):
         if user_id:
@@ -75,7 +111,6 @@ class UserResource(Resource):
             if user:
                 return user.to_dict(), 200
             return {"error": "User not found"}, 404
-        
         users = User.query.all()
         return {"users": [user.to_dict() for user in users]}, 200
 
@@ -89,37 +124,77 @@ class UserResource(Resource):
             return {"error": "User with that username or email already exists"}, 400
 
         hashed_password = bcrypt.generate_password_hash(data['password']).decode('utf-8')
+        confirmation_token = generate_confirmation_token(data['email'])
 
         new_user = User(
             name=data['name'],
             username=data['username'],
             email=data['email'],
-            password=hashed_password,  
-            role=data.get('role', 'user')
+            password=hashed_password,
+            role=data.get('role', 'user'),
+            email_verified=False,
+            confirmation_token=confirmation_token
         )
-        
         db.session.add(new_user)
         db.session.commit()
 
+        send_confirmation_email(new_user, confirmation_token)
         return new_user.to_dict(), 201
 
     def delete(self, user_id):
         user = User.query.get(user_id)
         if not user:
             return {"error": "User not found"}, 404
-        
         db.session.delete(user)
         db.session.commit()
 
         return {"message": f"User with id {user_id} has been deleted"}, 200
+    
+    @app.route('/users/<int:user_id>', methods=['PATCH'])
+    def update_user(user_id):
+        data = request.get_json()
+        user = User.query.get(user_id)
+        if not user:
+            return jsonify({"error": "User not found"}), 404
+
+        
+        if 'username' in data:
+            user.username = data['username']
+        if 'email' in data:
+            user.email = data['email']
+        if 'contactNumber' in data:
+            user.contact_number = data['contactNumber']
+        if 'address' in data:
+            user.address = data['address']
+        if 'password' in data:
+            hashed_password = bcrypt.generate_password_hash(data['password']).decode('utf-8')
+            user.password = hashed_password
+        if 'avatar' in data:
+            user.avatar = data['avatar']
+
+        
+        db.session.commit()
+
+        return jsonify({
+            "message": "Profile updated successfully",
+            "user": {
+                "id": user.id,
+                "username": user.username,
+                "email": user.email,
+                "contact_number": user.contact_number,
+                "address": user.address,
+                "avatar": user.avatar
+            }
+        }), 200
 
 
 class RegisterResource(Resource):
     def post(self):
-        name = request.json.get("name")
-        username = request.json.get("username")
-        email = request.json.get("email")
-        password = request.json.get("password")
+        data = request.get_json()
+        name = data.get("name")
+        username = data.get("username")
+        email = data.get("email")
+        password = data.get("password")
 
         if not username or not email or not password or not name:
             return {"error": "Missing fields"}, 400
@@ -128,9 +203,11 @@ class RegisterResource(Resource):
             return {"error": "Email already exists"}, 400
 
         hashed_password = bcrypt.generate_password_hash(password).decode('utf-8')
-        new_user = User(username=username, email=email, password=hashed_password, name=name)
+        confirmation_token = generate_confirmation_token(email)
+        new_user = User(username=username, email=email, password=hashed_password, name=name, email_verified=False, confirmation_token=confirmation_token)
         db.session.add(new_user)
         db.session.commit()
+        send_confirmation_email(new_user, confirmation_token)
         return new_user.to_dict(), 201
 
 class LoginResource(Resource):
@@ -145,9 +222,23 @@ class LoginResource(Resource):
         if not bcrypt.check_password_hash(user.password, password):
             return {"error": "Invalid credentials"}, 401
 
+        if not user.email_verified:
+            return {"error": "Email not verified"}, 401
+
         token = create_access_token(identity={'username': user.username, 'role': user.role})
         return {"message": "Logged in successfully", "token": token, "role": user.role, "user_id": user.id}, 200
 
+@app.route('/confirm/<token>', methods=['GET'])
+def confirm_email(token):
+    email = confirm_token(token)
+    if email:
+        user = User.query.filter_by(email=email).first()
+        if user:
+            user.email_verified = True
+            user.confirmation_token = None
+            db.session.commit()
+            return jsonify({"message": "Email confirmed successfully"}), 200
+    return jsonify({"error": "Invalid or expired token"}), 400
 
 def parse_time(time_str):
     try:
@@ -202,8 +293,8 @@ class EventResource(Resource):
         data = request.json
         event.name = data.get('name', event.name)
         event.type = data.get('type', event.type)
-        event.date = data.get('date', event.date)
-        event.time = data.get('time', event.time)
+        event.date = datetime.strptime(data.get('date', event.date.strftime('%Y-%m-%d')), '%Y-%m-%d').date()
+        event.time = parse_time(data.get('time', event.time.strftime('%H:%M:%S')))
         event.location = data.get('location', event.location)
         event.image_url = data.get('image_url', event.image_url)
 
@@ -214,11 +305,10 @@ class EventResource(Resource):
         event = Event.query.get(event_id)
         if not event:
             return {"error": "Event not found"}, 404
-
         db.session.delete(event)
         db.session.commit()
-        return {"message": "Event deleted"}, 200
-
+        return {"message": f"Event with id {event_id} has been deleted"}, 200
+    
 class RSVPResource(Resource):
    
     @jwt_required()
@@ -346,17 +436,17 @@ class IncidentResource(Resource):
 
         data = request.json
         incident.name = data.get('name', incident.name)
-        incident.date = datetime.strptime(data.get('date', incident.date), '%Y-%m-%d').date()  
+        incident.date = datetime.strptime(data.get('date', incident.date.strftime('%Y-%m-%d')), '%Y-%m-%d').date()
         incident.type = data.get('type', incident.type)
         incident.priority = data.get('priority', incident.priority)
         incident.location = data.get('location', incident.location)
         incident.description = data.get('description', incident.description)
+        incident.solved = data.get('solved', incident.solved)
 
         db.session.commit()
         return incident.to_dict(), 200
-     
-    @app.route('/incidents/<int:incident_id>', methods=['DELETE'])
-    def delete_incident(incident_id):
+
+    def delete(self, incident_id):
         incident = Incident.query.get(incident_id)
         if not incident:
             return {"error": "Incident not found"}, 404
@@ -364,8 +454,7 @@ class IncidentResource(Resource):
         db.session.delete(incident)
         db.session.commit()
         return {"message": "Incident deleted"}, 200
-
-
+    
 class NotificationResource(Resource):
     def get(self, notification_id=None):
         if notification_id:
@@ -378,14 +467,25 @@ class NotificationResource(Resource):
         return {"notifications": [notification.to_dict() for notification in notifications]}, 200
 
     def post(self):
+        
         data = request.json
-        message = data.get('message')
-        user_id = data.get('user_id')
+        print("Received data:", data)  
 
-        if not message or not user_id:
+        title = data.get('title')
+        message = data.get('message')
+        date_str = data.get('date')
+
+        if not title or not message or not date_str:
             return {"error": "Missing fields"}, 400
 
-        new_notification = Notification(message=message, user_id=user_id)
+     
+        try:
+            date = datetime.strptime(date_str, '%Y-%m-%d').date()
+        except ValueError:
+            return {"error": "Invalid date format. Use YYYY-MM-DD."}, 400
+
+     
+        new_notification = Notification(title=title, message=message, date=date)
         db.session.add(new_notification)
         db.session.commit()
         return new_notification.to_dict(), 201
@@ -398,14 +498,13 @@ class NotificationResource(Resource):
         db.session.delete(notification)
         db.session.commit()
         return {"message": "Notification deleted"}, 200
-
-
+    
 class ThreadListResource(Resource):
     def get(self):
         threads = ForumThread.query.all()
         return jsonify([{
             'id': thread.id,
-            'title': thread.title or 'Untitled Thread',  # Default title if missing
+            'title': thread.title or 'Untitled Thread',  
             'creator_id': thread.creator_id,
             'created_at': thread.created_at
         } for thread in threads])
@@ -429,7 +528,7 @@ class ThreadListResource(Resource):
             return {'error': 'Thread not found'}, 404
 
         try:
-            # Delete associated messages
+            
             ForumMessage.query.filter_by(thread_id=thread_id).delete()
             db.session.delete(thread)
             db.session.commit()
@@ -491,8 +590,7 @@ class MessageListResource(Resource):
 
         if not message:
             return {'error': 'Message not found'}, 404
-        
-        # Update the message text
+       
         message.text = new_text
         db.session.commit()
         
@@ -534,6 +632,18 @@ class ContactMessageResource(Resource):
 
         return new_message.to_dict(), 201
 
+class ProfileResource(Resource):
+    def get(self):
+        user_id = request.args.get('user_id')
+        if not user_id:
+            return jsonify({"error": "User ID is required"}), 400
+
+        user = User.query.get(user_id)
+        if user is None:
+            return jsonify({"error": "User not found"}), 404
+
+        return jsonify(user.to_dict())
+
     
 api.add_resource(Index, '/')
 api.add_resource(UserResource, '/users', '/users/<int:user_id>')
@@ -546,6 +656,7 @@ api.add_resource(NotificationResource, '/notifications', '/notifications/<int:no
 api.add_resource(ThreadListResource, '/threads', '/threads/<int:thread_id>' )
 api.add_resource(MessageListResource,'/threads/<int:thread_id>/messages', '/threads/<int:thread_id>/messages/<int:message_id>')
 api.add_resource(ContactMessageResource, '/contact-messages')
+api.add_resource(ProfileResource, '/profile')
 
 if __name__ == '__main__':
    app.run(port=5555, debug=True)

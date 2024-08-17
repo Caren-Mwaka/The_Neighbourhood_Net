@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState } from "react"; // Import React and useState
 import { useNavigate } from "react-router-dom";
 import InputField from "./InputField";
 import "./LoginPage.css";
@@ -18,7 +18,7 @@ function LoginPage() {
   const [loading, setLoading] = useState(false);
   const [errors, setErrors] = useState({});
   const navigate = useNavigate();
-
+  
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
@@ -50,13 +50,19 @@ function LoginPage() {
       const data = await response.json();
 
       if (!response.ok) {
-        throw new Error(data.error || "Login failed");
+        if (data.error === "Email not verified") {
+          toast.warning("Please verify your email address.");
+        } else {
+          throw new Error(data.error || "Login failed");
+        }
+        setLoading(false);
+        return;
       }
 
       toast.success("Login successful!");
       localStorage.setItem("token", data.token);
-      localStorage.setItem("user_id", data.user_id); 
-      localStorage.setItem("refreshToken", data.refreshToken); 
+      localStorage.setItem("user_id", data.user_id);
+      localStorage.setItem("refreshToken", data.refreshToken);
       localStorage.setItem("role", data.role);
 
       if (data.role === "admin") {
@@ -71,6 +77,36 @@ function LoginPage() {
       setLoading(false);
     }
   };
+
+  // Handle successful email confirmation from the URL (assuming confirmation token is in the URL)
+  const handleEmailConfirmation = async () => {
+    const urlParams = new URLSearchParams(window.location.search);
+    const token = urlParams.get("token");
+    if (token) {
+      console.log("Confirmation token:", token); // Add debug log
+      try {
+        const response = await fetch("https://the-neighbourhood-net-1.onrender.com/confirm/" + token, {
+          method: "GET",
+        });
+        const data = await response.json();
+        console.log("Confirmation response:", data); // Add debug log
+        if (response.ok) {
+          toast.success("Email confirmed successfully!");
+          window.location.href = "/login"; // Adjust path if needed
+        } else {
+          throw new Error(data.error || "Email confirmation failed");
+        }
+      } catch (error) {
+        console.error("Email confirmation failed:", error);
+        toast.error("Email confirmation failed. Please try again.");
+      }
+    }
+  };
+
+  // Call handleEmailConfirmation on component mount to check for confirmation token
+  React.useEffect(() => {
+    handleEmailConfirmation();
+  }, []);
 
   return (
     <main className="main-container">

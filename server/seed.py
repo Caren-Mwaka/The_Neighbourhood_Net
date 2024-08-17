@@ -1,4 +1,3 @@
-
 from app import app, db, bcrypt
 from models import User, Event, RSVP, Incident, Notification, ForumThread, ForumMessage
 from datetime import datetime, time
@@ -69,11 +68,16 @@ with app.app_context():
             username=user_data['username'],
             email=user_data['email'],
             password=bcrypt.generate_password_hash(user_data['password']).decode('utf-8'),
-            role=user_data.get('role', 'user')
+            role=user_data.get('role', 'user'),
+            created_at=datetime.utcnow(),
+            email_verified=True,  # Assuming this field exists in your model
+            confirmation_token=None,  # Assuming you don’t have confirmation tokens
+            contact_number=user_data.get('contact_number'),  # Optional field
+            address=user_data.get('address'),  # Optional field
+            avatar=user_data.get('avatar')  # Optional field
         )
         db.session.add(user)
-        db.session.commit()
-
+    
     for event_data in events:
         db.session.add(Event(
             name=event_data['name'],
@@ -85,8 +89,10 @@ with app.app_context():
         ))
 
     for rsvp_data in rsvps:
-        rsvp = RSVP(**rsvp_data)
-        db.session.add(rsvp)
+        db.session.add(RSVP(
+            user_id=rsvp_data['user_id'],
+            event_id=rsvp_data['event_id']
+        ))
 
     for incident_data in incidents:
         db.session.add(Incident(
@@ -118,7 +124,7 @@ with app.app_context():
             creator_id=message_data['creator_id'],
             created_at=message_data['created_at']
         ))
-        
+
     db.session.commit()
 
     print("Database seeded successfully!")

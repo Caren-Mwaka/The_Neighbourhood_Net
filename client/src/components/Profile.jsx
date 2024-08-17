@@ -1,6 +1,8 @@
 
 import React, { useState, useEffect } from "react";
-import styles from "./Profile.module.css"; // Updated import to use CSS Modules
+import { toast, ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
+import styles from "./Profile.module.css";
 import { Visibility, VisibilityOff } from "@mui/icons-material";
 
 const Profile = () => {
@@ -9,74 +11,148 @@ const Profile = () => {
     email: "",
     contactNumber: "",
     address: "",
-    password: "",
+    password: "", 
   });
 
   const [avatar, setAvatar] = useState(null);
   const [showPassword, setShowPassword] = useState(false);
+  const [isUploading, setIsUploading] = useState(false);
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
     setFormData((prevState) => ({
       ...prevState,
-      [name]: value,
+      [name]: value || "", 
     }));
+  };
+
+  const handleImageUpload = async (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      setIsUploading(true);
+      const imageData = new FormData();
+      imageData.append("file", file);
+      imageData.append("upload_preset", "zjphv40j");
+
+      try {
+        const response = await fetch(
+          "https://api.cloudinary.com/v1_1/djlpav9jq/image/upload",
+          {
+            method: "POST",
+            body: imageData,
+          }
+        );
+
+        if (!response.ok) {
+          throw new Error("Failed to upload image");
+        }
+
+        const data = await response.json();
+        const imageUrl = data.secure_url;
+
+        const userId = localStorage.getItem("user_id");
+        const token = localStorage.getItem("token");
+
+        const updateResponse = await fetch(`${import.meta.env.VITE_BASE_URL}/users/${userId}`, {
+          method: "PATCH",
+          headers: {
+            "Content-Type": "application/json",
+            "Authorization": `Bearer ${token}`,
+          },
+          body: JSON.stringify({ avatar: imageUrl }),
+        });
+
+        if (!updateResponse.ok) {
+          throw new Error("Failed to update avatar");
+        }
+
+        setAvatar(imageUrl);
+        toast.success("Image uploaded successfully!");
+      } catch (error) {
+        console.error("Error uploading image:", error);
+        toast.error("Error uploading image. Please try again.");
+      } finally {
+        setIsUploading(false);
+      }
+    }
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+
+    if (isUploading) {
+        toast.error("Please wait until the image upload is complete.");
+        return;
+    }
+
     try {
-      const response = await fetch("/api/profile", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(formData),
-      });
+        const userId = localStorage.getItem("user_id");
+        const token = localStorage.getItem("token");
 
-      if (!response.ok) {
-        throw new Error("Failed to update profile");
-      }
+        const response = await fetch(`${import.meta.env.VITE_BASE_URL}/users/${userId}`, {
+            method: "PATCH",
+            headers: {
+                "Content-Type": "application/json",
+                "Authorization": `Bearer ${token}`
+            },
+            body: JSON.stringify({
+                username: formData.username,
+                email: formData.email,
+                contactNumber: formData.contactNumber,  // Ensure this matches the backend field name
+                address: formData.address,
+                password: formData.password,
+                avatar: formData.avatar  // Include avatar if available
+            }),
+        });
 
-      const data = await response.json();
-      console.log("Profile updated successfully:", data);
+        if (!response.ok) {
+            throw new Error("Failed to update profile");
+        }
+
+        const data = await response.json();
+        toast.success("Profile updated successfully!");
+        console.log("Profile updated successfully:", data);
     } catch (error) {
-      console.error("Error updating profile:", error);
+        toast.error("Error updating profile. Please try again.");
+        console.error("Error updating profile:", error);
     }
-  };
+};
 
-  const handleImageUpload = (e) => {
-    const file = e.target.files[0];
-    if (file) {
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        setAvatar(reader.result);
-      };
-      reader.readAsDataURL(file);
-    }
-  };
+
+
 
   const handleLogout = () => {
     console.log("Logout clicked");
+    localStorage.removeItem("user_id");
+    // Redirect to login page or handle logout logic
   };
 
   useEffect(() => {
     const fetchProfile = async () => {
-      const username = formData.username;
+      const userId = localStorage.getItem("user_id");
       try {
-        const response = await fetch(`/api/profile?username=${username}`);
+        const response = await fetch(`${import.meta.env.VITE_BASE_URL}/users/${userId}`);
         if (!response.ok) {
           throw new Error("Failed to fetch profile");
         }
         const data = await response.json();
-        setFormData(data);
+        setFormData({
+          username: data.username || "",
+          email: data.email || "",
+          contactNumber: data?.contact_number || "",
+          address: data.address || "",
+          password: data.password || "",
+          avatar: data.avatar || ""
+        });
+        setAvatar(data.avatar || null);
       } catch (error) {
         console.error("Error fetching profile:", error);
       }
     };
-
+  
     fetchProfile();
-  }, []);
+  }, []);  
+  
 
   const togglePasswordVisibility = () => {
     setShowPassword((prev) => !prev);
@@ -84,6 +160,7 @@ const Profile = () => {
 
   return (
     <div className={styles.profileContainer}>
+      <ToastContainer />
       <div className={styles.contentWrapper}>
         <div className={styles.sidebarColumn}>
           <aside className={styles.sidebar}>
@@ -172,7 +249,7 @@ const Profile = () => {
                 type={showPassword ? "text" : "password"}
                 id="password"
                 name="password"
-                className={styles.formInput} // Use styles.formInput for consistency
+                className={styles.formInput}
                 value={formData.password}
                 onChange={handleInputChange}
               />
@@ -184,8 +261,12 @@ const Profile = () => {
                 {showPassword ? <Visibility /> : <VisibilityOff />}
               </button>
             </div>
-            <button type="submit" className={styles.updateButton}>
-              Update Information
+            <button
+              type="submit"
+              className={styles.updateButton}
+              disabled={isUploading}
+            >
+              {isUploading ? "Uploading..." : "Update Information"}
             </button>
           </form>
         </div>

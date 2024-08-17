@@ -10,21 +10,30 @@ db = SQLAlchemy()
 
 class User(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.String(255), nullable=False) 
+    name = db.Column(db.String(255), nullable=False)
     username = db.Column(db.String(80), nullable=False, unique=True)
     email = db.Column(db.String(120), nullable=False, unique=True)
     password = db.Column(db.String(255), nullable=False)
-    role = db.Column(db.String(20), nullable=False, default='user') 
-    created_at = db.Column(db.DateTime, nullable=False, default=db.func.current_timestamp())
+    role = db.Column(db.String(20), nullable=False, default='user')
+    created_at = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
+    email_verified = db.Column(db.Boolean, default=False)
+    confirmation_token = db.Column(db.String(255))
+    contact_number = db.Column(db.String(20), nullable=True)
+    address = db.Column(db.String(255), nullable=True)
+    avatar = db.Column(db.String(255), nullable=True)
 
     rsvps = db.relationship('RSVP', back_populates='user', cascade='all, delete-orphan', overlaps='events')
     events = db.relationship('Event', secondary='rsvp', back_populates='users', overlaps='rsvps')
 
-   
     @validates('email')
     def validate_email(self, key, email):
-        if not re.match(r"[^@]+@[^@]+\.[^@]+", email):
-            raise ValueError("Invalid email format")
+        # Regular expression to match emails that:
+        # - Start with any characters except '@'
+        # - Contain '@' followed by any characters except '!'
+        # - End with '.com'
+        pattern = r"^[^@!]+@[^\s!]+\.com$"
+        if not re.match(pattern, email):
+            raise ValueError("Email must be valid, end with '.com', and not contain '!' in the domain")
         return email
 
     @validates('password')
@@ -47,10 +56,16 @@ class User(db.Model):
             "name": self.name,
             "username": self.username,
             "email": self.email,
+            "email_verified": self.email_verified,
+            "confirmation_token": self.confirmation_token,
+            "contact_number": self.contact_number,
+            "address": self.address,
+            "avatar": self.avatar,
             "role": self.role, 
             "created_at": self.created_at.isoformat(),
             "events": [event.id for event in self.events]
         }
+
 
 class ForumThread(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -60,6 +75,16 @@ class ForumThread(db.Model):
     creator = db.relationship('User', backref=db.backref('threads', lazy=True))
     messages = db.relationship('ForumMessage', backref='thread', cascade="all, delete-orphan")
 
+    def to_dict(self):
+        return {
+            'id': self.id,
+            'title': self.title,
+            'creator_id': self.creator_id,
+            'created_at': self.created_at.isoformat() if self.created_at else None,
+            'creator': self.creator.to_dict() if self.creator else None,
+            'messages': [message.to_dict() for message in self.messages]
+        }
+
 class ForumMessage(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     text = db.Column(db.Text, nullable=False)
@@ -68,7 +93,16 @@ class ForumMessage(db.Model):
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
     creator = db.relationship('User', backref=db.backref('messages', lazy=True))
     
-
+    def to_dict(self):
+        return {
+            'id': self.id,
+            'text': self.text,
+            'thread_id': self.thread_id,
+            'creator_id': self.creator_id,
+            'created_at': self.created_at.isoformat() if self.created_at else None,
+            'creator': self.creator.to_dict() if self.creator else None
+        }
+    
 class Event(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(100), nullable=False)
@@ -121,24 +155,26 @@ def update_rsvp_names(mapper, connection, target):
 
 class Incident(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.String(100), nullable=False) 
-    date = db.Column(db.Date, nullable=False) 
+    name = db.Column(db.String(100), nullable=False)
+    date = db.Column(db.Date, nullable=False)
     type = db.Column(db.String(50), nullable=False)
     description = db.Column(db.String(255), nullable=False)
     location = db.Column(db.String(100), nullable=False)
     priority = db.Column(db.String(20), nullable=False)
+    solved = db.Column(db.Boolean, default=False)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
     updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
 
     def to_dict(self):
         return {
             'id': self.id,
-            'name': self.name, 
-            'date': self.date.isoformat(), 
+            'name': self.name,
+            'date': self.date.isoformat(),
             'type': self.type,
             'description': self.description,
             'location': self.location,
             'priority': self.priority,
+            'solved': self.solved,
             'created_at': self.created_at.isoformat(),
             'updated_at': self.updated_at.isoformat()
         }
@@ -148,7 +184,7 @@ class Notification(db.Model):
     title = db.Column(db.String(100), nullable=False)
     message = db.Column(db.String(250), nullable=False)
     date = db.Column(db.Date, nullable=False)
-    dismissed = db.Column(db.Boolean, default=False)  # New field
+    dismissed = db.Column(db.Boolean, default=False) 
 
     def to_dict(self):
         return {

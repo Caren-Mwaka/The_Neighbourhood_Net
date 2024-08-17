@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from "react";
 import dashlogo from "../assets/neighbourhood-net-logo.png";
 import { useNavigate } from "react-router-dom";
-
 import {
   Button,
   Typography,
@@ -173,8 +172,7 @@ const AdminDashboard = () => {
   };
 
   const handleAddEvent = async () => {
-    const formattedTime =
-      newEvent.time.length === 5 ? `${newEvent.time}:00` : newEvent.time;
+    const formattedTime = newEvent.time.length === 5 ? `${newEvent.time}:00` : newEvent.time;
     try {
       const response = await fetch(`${import.meta.env.VITE_BASE_URL}/events`, {
         method: "POST",
@@ -204,27 +202,32 @@ const AdminDashboard = () => {
 
   const handleAddNotification = async () => {
     try {
+      // Ensure newNotification contains all required fields
+      console.log("New Notification Data:", newNotification);
+  
       const response = await fetch(`${import.meta.env.VITE_BASE_URL}/notifications`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(newNotification),
       });
+  
       if (response.ok) {
         const data = await response.json();
         setNotifications([...notifications, data]);
         toast.success("Notification added successfully!");
         setNewNotification({ title: "", message: "", date: "" });
       } else {
+        // Log the full error response to understand what's missing
         const errorData = await response.json();
-        toast.error(
-          `Failed to add notification: ${errorData.error || "Unknown error"}`
-        );
+        console.error("Error Response:", errorData);
+        toast.error(`Failed to add notification: ${errorData.error || "Unknown error"}`);
       }
     } catch (error) {
       console.error("Error adding notification:", error);
       toast.error("Failed to add notification.");
     }
   };
+  
 
   const handleDeleteUser = async (userId) => {
     try {
@@ -245,16 +248,11 @@ const AdminDashboard = () => {
 
   const handleDeleteIncident = async (incidentId) => {
     try {
-      const response = await fetch(
-        `${import.meta.env.VITE_BASE_URL}/${incidentId}`,
-        {
-          method: "DELETE",
-        }
-      );
+      const response = await fetch(`${import.meta.env.VITE_BASE_URL}/${incidentId}`, {
+        method: "DELETE",
+      });
       if (response.ok) {
-        setIncidents(
-          incidents.filter((incident) => incident.id !== incidentId)
-        );
+        setIncidents(incidents.filter((incident) => incident.id !== incidentId));
         toast.success("Incident deleted successfully!");
       } else {
         toast.error("Failed to delete incident.");
@@ -267,7 +265,7 @@ const AdminDashboard = () => {
 
   const handleDeleteEvent = async (eventId) => {
     try {
-      const response = await fetch(`${import.meta.env.VITE_BASE_URL}/${eventId}`, {
+      const response = await fetch(`${import.meta.env.VITE_BASE_URL}/events/${eventId}`, {
         method: "DELETE",
       });
       if (response.ok) {
@@ -284,18 +282,11 @@ const AdminDashboard = () => {
 
   const handleDeleteNotification = async (notificationId) => {
     try {
-      const response = await fetch(
-        `${import.meta.env.VITE_BASE_URL}/${notificationId}`,
-        {
-          method: "DELETE",
-        }
-      );
+      const response = await fetch(`${import.meta.env.VITE_BASE_URL}/notifications/${notificationId}`, {
+        method: "DELETE",
+      });
       if (response.ok) {
-        setNotifications(
-          notifications.filter(
-            (notification) => notification.id !== notificationId
-          )
-        );
+        setNotifications(notifications.filter((notification) => notification.id !== notificationId));
         toast.success("Notification deleted successfully!");
       } else {
         toast.error("Failed to delete notification.");
@@ -305,6 +296,36 @@ const AdminDashboard = () => {
       toast.error("Failed to delete notification.");
     }
   };
+
+  const handleToggleSolvedIncident = async (incidentId, solved) => {
+    try {
+      const response = await fetch(`${import.meta.env.VITE_BASE_URL}/incidents/${incidentId}`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ solved: !solved }), // Toggle solved state
+      });
+  
+      if (response.ok) {
+        const updatedIncident = await response.json();
+        console.log("Updated Incident:", updatedIncident); // Log updated incident
+  
+        // Update state
+        setIncidents((prevIncidents) =>
+          prevIncidents.map((incident) =>
+            incident.id === incidentId ? updatedIncident : incident
+          )
+        );
+  
+        toast.success(`Incident ${!solved ? "marked as solved" : "marked as unsolved"} successfully!`);
+      } else {
+        toast.error("Failed to update incident.");
+      }
+    } catch (error) {
+      console.error("Error updating incident:", error);
+      toast.error("Failed to update incident.");
+    }
+  };
+  
 
   const handleTabChange = (event, newTab) => {
     setActiveTab(newTab);
@@ -354,7 +375,6 @@ const AdminDashboard = () => {
           justifyContent: "space-between",
           alignItems: "center",
           mb: 4,
-
           marginTop: -4,
         }}
       >
@@ -681,27 +701,52 @@ const AdminDashboard = () => {
                   <br />
                   {incident.date}
                 </Typography>
-                <Button
-                  variant="outlined"
-                  sx={{
-                    backgroundColor: "#43B9AB",
-                    color: "white",
-                    borderColor: "#43B9AB",
-                    "&:hover": {
-                      backgroundColor: "#39a599",
-                      borderColor: "#39a599",
-                    },
-                  }}
-                  onClick={() => handleDeleteIncident(incident.id)}
-                >
-                  Delete
-                </Button>
+                <Box display="flex" gap={1}>
+                  <Button
+                    variant="outlined"
+                    sx={{
+                      backgroundColor: incident.solved ? "#43B9AB" : "#FF4C4C",
+                      color: "white",
+                      borderColor: incident.solved ? "#43B9AB" : "#FF4C4C",
+                      "&:hover": {
+                        backgroundColor: incident.solved
+                          ? "#39a599"
+                          : "#ff6b6b",
+                        borderColor: incident.solved
+                          ? "#39a599"
+                          : "#ff6b6b",
+                      },
+                    }}
+                    onClick={() =>
+                      handleToggleSolvedIncident(incident.id, incident.solved)
+                    }
+                  >
+                    {incident.solved ? "SOLVED" : "UNSOLVED"}
+                  </Button>
+                  <Button
+                    variant="outlined"
+                    sx={{
+                      backgroundColor: "#43B9AB",
+                      color: "white",
+                      borderColor: "#43B9AB",
+                      "&:hover": {
+                        backgroundColor: "#39a599",
+                        borderColor: "#39a599",
+                      },
+                    }}
+                    onClick={() => handleDeleteIncident(incident.id)}
+                  >
+                    Delete
+                  </Button>
+                </Box>
               </Box>
             ))}
             <Pagination
               count={Math.ceil(incidents.length / incidentsPerPage)}
               page={incidentPage}
-              onChange={(e, value) => handlePageChange(e, value, "incidents")}
+              onChange={(e, value) =>
+                handlePageChange(e, value, "incidents")
+              }
               sx={{ mt: 2 }}
             />
           </Box>
@@ -743,7 +788,7 @@ const AdminDashboard = () => {
               InputLabelProps={{ shrink: true }}
             />
             <TextField
-              label=""
+              label="Time"
               type="time"
               value={newEvent.time}
               onChange={(e) =>

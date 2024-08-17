@@ -65,14 +65,19 @@ const Forum = () => {
       try {
         const response = await fetch(`${import.meta.env.VITE_BASE_URL}/threads`);
         const data = await response.json();
-        setThreads(data);
+        if (Array.isArray(data)) {
+          setThreads(data);
+        } else {
+          console.error("Unexpected format for threads:", data);
+        }
       } catch (error) {
         console.error("Failed to fetch threads:", error);
       }
     };
-
+  
     fetchThreads();
   }, []);
+  
 
   useEffect(() => {
     if (selectedThread) {
