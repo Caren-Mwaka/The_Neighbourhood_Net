@@ -77,7 +77,7 @@ def generate_token(user):
 def logout():
     session.clear()
     response = jsonify({"message": "Logged out successfully"})
-    response.headers.add('Access-Control-Allow-Origin', 'http://localhost:5173')
+    response.headers.add('Access-Control-Allow-Origin', 'https://the-neighbourhood-net.vercel.app')
     response.headers.add('Access-Control-Allow-Credentials', 'true')
     return response
 
