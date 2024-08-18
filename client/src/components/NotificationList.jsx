@@ -25,7 +25,7 @@ const NotificationList = () => {
 
   const handleDismiss = async (id) => {
     try {
-      await fetch(`${import.meta.env.VITE_BASE_URL}/${id}`, {
+      await fetch(`${import.meta.env.VITE_BASE_URL}/notifications/${id}`, {
         method: 'DELETE',
       });
 
