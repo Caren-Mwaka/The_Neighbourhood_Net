@@ -123,6 +123,7 @@ const AdminDashboard = () => {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(newUser),
       });
+  
       if (response.ok) {
         const data = await response.json();
         setUsers([...users, data]);
@@ -135,13 +136,15 @@ const AdminDashboard = () => {
           role: "",
         });
       } else {
-        toast.error("Failed to add user.");
+        const errorData = await response.json();
+        toast.error(`Failed to add user: ${errorData.error}`);
       }
     } catch (error) {
       console.error("Error adding user:", error);
       toast.error("Failed to add user.");
     }
   };
+  
 
   const handleAddIncident = async () => {
     try {

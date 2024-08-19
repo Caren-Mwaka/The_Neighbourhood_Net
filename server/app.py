@@ -117,12 +117,15 @@ class UserResource(Resource):
     def post(self):
         data = request.get_json()
 
+        # Log the incoming data for debugging
+        print("Incoming data:", data)
+
         if not data or not all(k in data for k in ("name", "username", "email", "password")):
             return {"error": "Missing data"}, 400
 
         if User.query.filter_by(username=data['username']).first() or User.query.filter_by(email=data['email']).first():
             return {"error": "User with that username or email already exists"}, 400
-
+        
         hashed_password = bcrypt.generate_password_hash(data['password']).decode('utf-8')
         confirmation_token = generate_confirmation_token(data['email'])
 
