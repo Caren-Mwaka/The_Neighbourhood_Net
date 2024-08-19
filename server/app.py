@@ -115,35 +115,39 @@ class UserResource(Resource):
         return {"users": [user.to_dict() for user in users]}, 200
 
     def post(self):
-        data = request.get_json()
+        try:
+            data = request.get_json()
 
-        # Log the incoming data for debugging
-        print("Incoming data:", data)
+            # Log the incoming data for debugging
+            print("Incoming data:", data)
 
-        if not data or not all(k in data for k in ("name", "username", "email", "password")):
-            return {"error": "Missing data"}, 400
+            if not data or not all(k in data for k in ("name", "username", "email", "password")):
+                return {"error": "Missing data"}, 400
 
-        if User.query.filter_by(username=data['username']).first() or User.query.filter_by(email=data['email']).first():
-            return {"error": "User with that username or email already exists"}, 400
+            if User.query.filter_by(username=data['username']).first() or User.query.filter_by(email=data['email']).first():
+                return {"error": "User with that username or email already exists"}, 400
+            
+            hashed_password = bcrypt.generate_password_hash(data['password']).decode('utf-8')
+            # confirmation_token = generate_confirmation_token(data['email'])
+
+            new_user = User(
+                name=data['name'],
+                username=data['username'],
+                email=data['email'],
+                password=hashed_password,
+                role=data.get('role', 'user'),
+                # email_verified=False,
+                # confirmation_token=confirmation_token
+            )
+            db.session.add(new_user)
+            db.session.commit()
+
+            # send_confirmation_email(new_user, confirmation_token)
+            return new_user.to_dict(), 201
+        except Exception as e:
+                print(f"Error during user creation: {str(e)}")
+                return {"error": "Internal server error"}, 500
         
-        hashed_password = bcrypt.generate_password_hash(data['password']).decode('utf-8')
-        confirmation_token = generate_confirmation_token(data['email'])
-
-        new_user = User(
-            name=data['name'],
-            username=data['username'],
-            email=data['email'],
-            password=hashed_password,
-            role=data.get('role', 'user'),
-            email_verified=False,
-            confirmation_token=confirmation_token
-        )
-        db.session.add(new_user)
-        db.session.commit()
-
-        send_confirmation_email(new_user, confirmation_token)
-        return new_user.to_dict(), 201
-
     def delete(self, user_id):
         user = User.query.get(user_id)
         if not user:
