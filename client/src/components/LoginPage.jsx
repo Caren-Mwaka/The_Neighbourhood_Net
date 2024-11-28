@@ -40,7 +40,7 @@ function LoginPage() {
 
     try {
       const response = await fetch(
-        "https://the-neighbourhood-net-1.onrender.com/login",
+        `${import.meta.env.VITE_BASE_URL}/login`,
         {
           method: "POST",
           headers: {
