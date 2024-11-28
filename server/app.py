@@ -7,11 +7,10 @@ from flask_jwt_extended import JWTManager, create_access_token, jwt_required, ge
 from flask_restful import Api, Resource
 from werkzeug.exceptions import NotFound
 from datetime import datetime, timedelta
-from flask_mail import Mail, Message
 import os
 import random
 import string
-from itsdangerous import URLSafeTimedSerializer, SignatureExpired, BadSignature
+
 
 app = Flask(__name__)
 
@@ -19,13 +18,7 @@ app.config['SECRET_KEY'] = 'SECRET_KEY'
 app.config['JWT_SECRET_KEY'] = 'JWT_SECRET_KEY'
 app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get('DATABASE_URI')
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
-app.config['MAIL_SERVER'] = 'MAIL_SERVER'  
-app.config['MAIL_PORT'] = 'MAIL_PORT'
-app.config['MAIL_USERNAME'] = 'MAIL_USERNAME'  
-app.config['MAIL_PASSWORD'] = 'MAIL_PASSWORD'  
-app.config['MAIL_DEFAULT_SENDER'] = 'MAIL_DEFAULT_SENDER'
-app.config['MAIL_USE_TLS'] = True
-app.config['MAIL_USE_SSL'] = False
+
 
 
 app.config['JWT_ACCESS_TOKEN_EXPIRES'] = timedelta(days=7)
@@ -34,41 +27,9 @@ db.init_app(app)
 bcrypt = Bcrypt(app)
 migrate = Migrate(app, db)
 CORS(app, resources={r"/*": {"origins": "https://the-neighbourhood-net.vercel.app", "supports_credentials": True}})
-mail = Mail(app)
 jwt = JWTManager(app)
 api = Api(app)
 
-
-s = URLSafeTimedSerializer(app.config['SECRET_KEY'])
-
-def generate_confirmation_token(email):
-    return s.dumps(email, salt='email-confirm')
-
-def confirm_token(token, expiration=3600):
-    try:
-        email = s.loads(token, salt='email-confirm', max_age=expiration)
-    except (SignatureExpired, BadSignature):
-        return False
-    return email
-
-def send_confirmation_email(user, token):
-    confirm_url = url_for('confirm_email', token=token, _external=True)
-    subject = "Please confirm your email address"
-    body = f"""
-    Hi {user.username},
-    Thanks for signing up! Please confirm your email address by clicking the link below:
-    {confirm_url}
-    If you did not make this request, please ignore this email.
-    Best regards,
-    Your Application Team
-    """
-    msg = Message(
-        subject=subject,
-        body=body,
-        recipients=[user.email],
-        sender=app.config['MAIL_DEFAULT_SENDER']
-    )
-    mail.send(msg)
 
 def generate_token(user):
     return create_access_token(identity=user.username)
@@ -128,7 +89,7 @@ class UserResource(Resource):
                 return {"error": "User with that username or email already exists"}, 400
             
             hashed_password = bcrypt.generate_password_hash(data['password']).decode('utf-8')
-            # confirmation_token = generate_confirmation_token(data['email'])
+           
 
             new_user = User(
                 name=data['name'],
@@ -136,13 +97,12 @@ class UserResource(Resource):
                 email=data['email'],
                 password=hashed_password,
                 role=data.get('role', 'user'),
-                # email_verified=False,
-                # confirmation_token=confirmation_token
+               
             )
             db.session.add(new_user)
             db.session.commit()
 
-            # send_confirmation_email(new_user, confirmation_token)
+           
             return new_user.to_dict(), 201
         except Exception as e:
                 print(f"Error during user creation: {str(e)}")
@@ -210,11 +170,9 @@ class RegisterResource(Resource):
             return {"error": "Email already exists"}, 400
 
         hashed_password = bcrypt.generate_password_hash(password).decode('utf-8')
-        confirmation_token = generate_confirmation_token(email)
-        new_user = User(username=username, email=email, password=hashed_password, name=name, email_verified=False, confirmation_token=confirmation_token)
+        new_user = User(username=username, email=email, password=hashed_password, name=name)
         db.session.add(new_user)
         db.session.commit()
-        send_confirmation_email(new_user, confirmation_token)
         return new_user.to_dict(), 201
 
 class LoginResource(Resource):
@@ -226,26 +184,16 @@ class LoginResource(Resource):
         if not user:
             return {"error": "Invalid credentials"}, 401
 
+        if not user:
+            return {"error": "Invalid credentials"}, 401
+
         if not bcrypt.check_password_hash(user.password, password):
             return {"error": "Invalid credentials"}, 401
 
-        if not user.email_verified:
-            return {"error": "Email not verified"}, 401
-
+     
         token = create_access_token(identity={'username': user.username, 'role': user.role})
         return {"message": "Logged in successfully", "token": token, "role": user.role, "user_id": user.id}, 200
 
-@app.route('/confirm/<token>', methods=['GET'])
-def confirm_email(token):
-    email = confirm_token(token)
-    if email:
-        user = User.query.filter_by(email=email).first()
-        if user:
-            user.email_verified = True
-            user.confirmation_token = None
-            db.session.commit()
-            return jsonify({"message": "Email confirmed successfully"}), 200
-    return jsonify({"error": "Invalid or expired token"}), 400
 
 def parse_time(time_str):
     try:

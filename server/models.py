@@ -16,8 +16,6 @@ class User(db.Model):
     password = db.Column(db.String(255), nullable=False)
     role = db.Column(db.String(20), nullable=False, default='user')
     created_at = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
-    email_verified = db.Column(db.Boolean, default=False)
-    confirmation_token = db.Column(db.String(255))
     contact_number = db.Column(db.String(20), nullable=True)
     address = db.Column(db.String(255), nullable=True)
     avatar = db.Column(db.String(255), nullable=True)
