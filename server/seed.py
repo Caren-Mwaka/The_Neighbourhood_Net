@@ -4,8 +4,8 @@ from datetime import datetime, time
 
 users = [
     {'name': 'Alice Smith', 'username': 'alice', 'email': 'alice@example.com', 'password': 'Password123!', 'role': 'admin'},
-    {'name': 'Bob Johnson', 'username': 'bob', 'email': 'bob@example.com', 'password': 'Password123!', 'role': 'user'},
-    {'name': 'Charlie Brown', 'username': 'charlie', 'email': 'charlie@example.com', 'password': 'Password123!', 'role': 'user'},
+    {'name': 'Bob Johnson', 'username': 'bob', 'email': 'bob@example.com', 'password': 'Password1234!', 'role': 'user'},
+    {'name': 'Charlie Brown', 'username': 'charlie', 'email': 'charlie@example.com', 'password': 'Password12345!', 'role': 'user'},
 ]
 
 events = [
@@ -70,8 +70,6 @@ with app.app_context():
             password=bcrypt.generate_password_hash(user_data['password']).decode('utf-8'),
             role=user_data.get('role', 'user'),
             created_at=datetime.utcnow(),
-            email_verified=True,  # Assuming this field exists in your model
-            confirmation_token=None,  # Assuming you don’t have confirmation tokens
             contact_number=user_data.get('contact_number'),  # Optional field
             address=user_data.get('address'),  # Optional field
             avatar=user_data.get('avatar')  # Optional field

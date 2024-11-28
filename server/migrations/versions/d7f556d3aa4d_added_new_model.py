@@ -1,8 +1,8 @@
-"""added email verified
+"""Added new model
 
-Revision ID: 9262055011c4
+Revision ID: d7f556d3aa4d
 Revises: 
-Create Date: 2024-08-15 09:58:11.343746
+Create Date: 2024-11-28 06:23:37.780941
 
 """
 from alembic import op
@@ -10,7 +10,7 @@ import sqlalchemy as sa
 
 
 # revision identifiers, used by Alembic.
-revision = '9262055011c4'
+revision = 'd7f556d3aa4d'
 down_revision = None
 branch_labels = None
 depends_on = None
@@ -44,6 +44,7 @@ def upgrade():
     sa.Column('description', sa.String(length=255), nullable=False),
     sa.Column('location', sa.String(length=100), nullable=False),
     sa.Column('priority', sa.String(length=20), nullable=False),
+    sa.Column('solved', sa.Boolean(), nullable=True),
     sa.Column('created_at', sa.DateTime(), nullable=True),
     sa.Column('updated_at', sa.DateTime(), nullable=True),
     sa.PrimaryKeyConstraint('id')
@@ -58,14 +59,15 @@ def upgrade():
     )
     op.create_table('user',
     sa.Column('id', sa.Integer(), nullable=False),
-    sa.Column('name', sa.String(length=100), nullable=False),
-    sa.Column('username', sa.String(length=50), nullable=False),
+    sa.Column('name', sa.String(length=255), nullable=False),
+    sa.Column('username', sa.String(length=80), nullable=False),
     sa.Column('email', sa.String(length=120), nullable=False),
-    sa.Column('password', sa.String(length=200), nullable=False),
-    sa.Column('role', sa.String(length=50), nullable=True),
-    sa.Column('email_verified', sa.Boolean(), nullable=True),
-    sa.Column('confirmation_token', sa.String(length=200), nullable=True),
-    sa.Column('created_at', sa.DateTime(), nullable=True),
+    sa.Column('password', sa.String(length=255), nullable=False),
+    sa.Column('role', sa.String(length=20), nullable=False),
+    sa.Column('created_at', sa.DateTime(), nullable=False),
+    sa.Column('contact_number', sa.String(length=20), nullable=True),
+    sa.Column('address', sa.String(length=255), nullable=True),
+    sa.Column('avatar', sa.String(length=255), nullable=True),
     sa.PrimaryKeyConstraint('id'),
     sa.UniqueConstraint('email'),
     sa.UniqueConstraint('username')
