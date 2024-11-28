@@ -39,16 +39,13 @@ function LoginPage() {
     }
 
     try {
-      const response = await fetch(
-        `${import.meta.env.VITE_BASE_URL}/login`,
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({ email, password }),
-        }
-      );
+      const response = await fetch(`${import.meta.env.VITE_BASE_URL}/login`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ email, password }),
+      });
 
       const data = await response.json();
 
@@ -99,7 +96,7 @@ function LoginPage() {
           <InputField
             label="Enter your password"
             type="password"
-            showPasswordToggle={true}
+            id="passwordInput"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
             error={errors.password}
@@ -107,11 +104,12 @@ function LoginPage() {
           <InputField
             label="Confirm your password"
             type="password"
-            showPasswordToggle={true}
+            id="confirmPasswordInput"
             value={confirmPassword}
             onChange={(e) => setConfirmPassword(e.target.value)}
             error={errors.confirmPassword}
           />
+
           {errors.general && <div className="error-text">{errors.general}</div>}
           <LoginButton loading={loading} />
         </form>
