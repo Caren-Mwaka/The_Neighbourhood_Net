@@ -7,6 +7,7 @@ from flask_jwt_extended import JWTManager, create_access_token, jwt_required, ge
 from flask_restful import Api, Resource
 from werkzeug.exceptions import NotFound
 from datetime import datetime, timedelta
+from sqlalchemy.exc import IntegrityError
 import os
 import random
 import string
@@ -166,13 +167,29 @@ class RegisterResource(Resource):
         if not username or not email or not password or not name:
             return {"error": "Missing fields"}, 400
 
+        # Check if email already exists
         if User.query.filter_by(email=email).first():
             return {"error": "Email already exists"}, 400
 
+        # Check if username already exists
+        if User.query.filter_by(username=username).first():
+            return {"error": "Username already exists"}, 400
+
         hashed_password = bcrypt.generate_password_hash(password).decode('utf-8')
-        new_user = User(username=username, email=email, password=hashed_password, name=name)
-        db.session.add(new_user)
-        db.session.commit()
+        new_user = User(
+            username=username,
+            email=email,
+            password=hashed_password,
+            name=name
+        )
+
+        try:
+            db.session.add(new_user)
+            db.session.commit()
+        except IntegrityError:
+            db.session.rollback()  # Rollback any changes made before the error
+            return {"error": "Database Integrity Error: Email or Username already exists"}, 400
+
         return new_user.to_dict(), 201
 
 class LoginResource(Resource):
