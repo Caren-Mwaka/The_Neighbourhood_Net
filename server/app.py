@@ -83,31 +83,36 @@ class UserResource(Resource):
             # Log the incoming data for debugging
             print("Incoming data:", data)
 
+            # Check for missing data
             if not data or not all(k in data for k in ("name", "username", "email", "password")):
                 return {"error": "Missing data"}, 400
 
+            # Check if user already exists
             if User.query.filter_by(username=data['username']).first() or User.query.filter_by(email=data['email']).first():
                 return {"error": "User with that username or email already exists"}, 400
             
+            # Hash the password
             hashed_password = bcrypt.generate_password_hash(data['password']).decode('utf-8')
-           
 
+            # Create new user
             new_user = User(
                 name=data['name'],
                 username=data['username'],
                 email=data['email'],
                 password=hashed_password,
-                role=data.get('role', 'user'),
-               
+                role=data.get('role', 'user')
             )
+            
             db.session.add(new_user)
             db.session.commit()
 
-           
             return new_user.to_dict(), 201
+        except IntegrityError:
+            db.session.rollback()  # Rollback if there is a unique constraint error
+            return {"error": "Database Integrity Error: Email or Username already exists"}, 400
         except Exception as e:
-                print(f"Error during user creation: {str(e)}")
-                return {"error": "Internal server error"}, 500
+            print(f"Error during user creation: {str(e)}")
+            return {"error": "Internal server error"}, 500
         
     def delete(self, user_id):
         user = User.query.get(user_id)
@@ -117,44 +122,31 @@ class UserResource(Resource):
         db.session.commit()
 
         return {"message": f"User with id {user_id} has been deleted"}, 200
-    
-    @app.route('/users/<int:user_id>', methods=['PATCH'])
-    def update_user(user_id):
+
+    def patch(self, user_id):
         data = request.get_json()
         user = User.query.get(user_id)
         if not user:
-            return jsonify({"error": "User not found"}), 404
+            return {"error": "User not found"}, 404
 
-        
+        # Update the user fields if provided in the data
         if 'username' in data:
             user.username = data['username']
         if 'email' in data:
             user.email = data['email']
-        if 'contactNumber' in data:
-            user.contact_number = data['contactNumber']
-        if 'address' in data:
-            user.address = data['address']
         if 'password' in data:
             hashed_password = bcrypt.generate_password_hash(data['password']).decode('utf-8')
             user.password = hashed_password
-        if 'avatar' in data:
-            user.avatar = data['avatar']
+        if 'role' in data:
+            user.role = data['role']
 
-        
+        # Commit the changes to the database
         db.session.commit()
 
         return jsonify({
             "message": "Profile updated successfully",
-            "user": {
-                "id": user.id,
-                "username": user.username,
-                "email": user.email,
-                "contact_number": user.contact_number,
-                "address": user.address,
-                "avatar": user.avatar
-            }
+            "user": user.to_dict()
         }), 200
-
 
 class RegisterResource(Resource):
     def post(self):
@@ -191,7 +183,7 @@ class RegisterResource(Resource):
             return {"error": "Database Integrity Error: Email or Username already exists"}, 400
 
         return new_user.to_dict(), 201
-
+    
 class LoginResource(Resource):
     def post(self):
         email = request.json.get("email")
